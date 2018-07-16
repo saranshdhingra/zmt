@@ -1,0 +1,8 @@
+{
+	"manifest_version": 2,
+	"name": "Zoho Mail Tracker By Crazy Ripples",
+	"short_name":"ZMT By CR",
+	"description": "This extensions helps you track the emails you send using Zoho Mail.",
+	"version": "2.0",
+	"homepage_url": "https://zohomailtracker.com"
+}
