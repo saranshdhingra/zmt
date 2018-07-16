@@ -4,5 +4,24 @@
 	"short_name":"ZMT By CR",
 	"description": "This extensions helps you track the emails you send using Zoho Mail.",
 	"version": "2.0",
-	"homepage_url": "https://zohomailtracker.com"
+	"icons":{
+				"16": "images/logo16.png",
+				"32": "images/logo32.png",
+				"48": "images/logo48.png",
+				"64": "images/logo64.png",
+				"128": "images/logo128.png"
+			},
+	"options_page": "options.html",
+	"homepage_url": "https://zohomailtracker.com",
+	"web_accessible_resources": [
+	    "images/mail_icon.svg",
+	    "images/muted.png",
+	    "images/unmuted.png",
+	    "images/icon_notif.png",
+	    "fonts/Roboto-Regular.woff",
+	    "fonts/Roboto-Medium.woff"
+	],
+	"permissions":[
+		"storage"
+	]
 }

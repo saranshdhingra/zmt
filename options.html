@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>Options | ZMT by Crazy Ripples</title>
+	<link rel="stylesheet" href="css/options.css">
+</head>
+<body>
+	<div id="root">
+		<header>
+			<div class="logo"><a href="" target="_blank"><img src="images/logo64.png"></a></div>
+			<div class="menu">
+				<span><a href="#" class="active">Settings</a></span>
+				<span><a href="#">FAQs</a></span>
+				<span><a href="#">Changelog</a></span>
+				<span><a href="#">Contact</a></span>
+			</div>
+		</header>
+		<div id="tab_contents">
+			<div class="tab_content active">
+				<fieldset>
+					<legend>Settings</legend>
+					<div class="user_settings">
+						<div class="input">
+							<label>
+								<span>User: </span><input type="text" id="user_email">
+							</label>
+							<button id="verify_email">Verify</button>
+							<button id="change_email" class="hidden">Change</button>
+						</div>
+						<div class="input otp_input hidden">
+							<label>
+								<span>OTP: </span><input type="text" id="otp">
+							</label>
+							<button id="verify_otp">Verify</button>						
+						</div>
+						<div class="input hidden">
+							<label>
+								<span>Tracking: </span>
+								<label class="switch"><input type="checkbox" id="chk_tracking_status" value="on"> <div class="slider round"></div></label>
+							</label>
+						</div>
+						<div class="input hidden">
+							<label>
+								<span>Mail Delay: </span>
+								<label class="switch"><input type="checkbox" id="chk_mail_delay" value="on"> <div class="slider round"></div></label>
+							</label>
+						</div>
+						<div class="input hidden">
+							<label>
+								<span>Delay Seconds</span>
+								<input type="number" min="1" max="5">
+							</label>
+						</div>
+						<div class="input hidden">
+							<label>
+								<span>Timezone:</span>
+								<select>
+									<option v-for="timezone in timezones">{{timezone}}</option>
+								</select>
+							</label>
+						</div>
+						<div class="input hidden">
+							<button class="long">Save Settings</button>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+			<div class="tab_content">
+				FAQs content
+			</div>
+			<div class="tab_content">
+				<div id="release_notes">
+					<h1>Version 1.7.5</h1>
+					<ul>
+						<li>Added support for all domains of zoho.</li>
+						<li>Removed some code for backward compatibilty.</li>
+					</ul>
+					<div class="btn_div"><a href="http://zohomailtracker.com" target="_blank">View Changelog</a></div>
+				</div>
+			</div>
+			<div class="tab_content">
+				Contact Content
+			</div>
+		</div>
+		<footer>
+			<div class="footer_menu">
+				<span><a href="#">Privacy Policy</a></span>
+				<span>Version: 2.0</span>
+			</div>
+		</footer>
+	</div>
+	<script src="js/jquery-3.3.1.min.js"></script>
+	<script src="js/options.js"></script>
+</body>
+</html>
