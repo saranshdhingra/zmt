@@ -105,12 +105,8 @@ function insert_tracker(send_btn){
 		cc_field = get_cc_field_val(send_btn),
 		bcc_field = get_bcc_field_val(send_btn);
 
-	console.log(subject,to_field,cc_field,bcc_field);
-	return;
-	//do some validations here! very important
-
-	fetch_hash(subject, to_field, cc_field, bcc_field, function (hash) {
-		var img_str = "<img src='" + base_url + "img/show?hash=" + hash + "' class='zmtr_pixel' />";
+	fetch_hash_from_server(subject, to_field, cc_field, bcc_field, function (hash) {
+		var img_str = "<img src='" + base_url + "img/show?hash=" + hash + "' class='zmt_pixel' />";
 
 		//first make sure that the hash is added to the list of hashes to be blocked, then append the image in the ,mail.
 		add_hash_to_local(hash, function () {
@@ -184,6 +180,35 @@ function extractEmails(text) {
 function is_email_valid(email) {
 	var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 	return re.test(String(email).toLowerCase());
+}
+
+function fetch_hash_from_server(subject, to_field, cc_field, bcc_field, callback) {
+	$.post(base_url + "img/new", {
+		api_token: zmt_settings.user.api_token,
+		subject: subject,
+		to_field: to_field,
+		cc_field: cc_field,
+		bcc_field: bcc_field
+	}, function (response) {
+		var hash = response.hash;
+		callback(hash);
+	});
+}
+
+//add a hash to the local list of hashes
+//let this task be handled by the background script
+function add_hash_to_local(hash, callback) {
+	chrome.runtime.sendMessage({
+		action: 'add_hash',
+		hash: hash
+	}, function () {
+		callback();
+	});
+}
+
+function send_mail(btn) {
+	btn.attr("data-event", "s").removeAttr("data-zmt_event");
+	btn.find("b").trigger("click");
 }
 
 function check_doc_email(){
