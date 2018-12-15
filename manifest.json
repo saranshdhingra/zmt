@@ -23,5 +23,14 @@
 	],
 	"permissions":[
 		"storage"
-	]
+	],
+	"content_scripts": [{
+		"matches": ["<all_urls>"],
+		"js": ["js/jquery-3.3.1.min.js","js/tracker.js"],
+		"run_at": "document_end"
+	}],
+	"background": {
+		"scripts": ["js/background.js"],
+		"persistent": true
+	}
 }
