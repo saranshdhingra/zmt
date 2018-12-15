@@ -14,6 +14,7 @@
 				<span><a href="#">FAQs</a></span>
 				<span><a href="#">Changelog</a></span>
 				<span><a href="#">Contact</a></span>
+				<span><a href="#" class="logout">Logout</a></span>
 			</div>
 		</header>
 		<div id="tab_contents">
@@ -34,34 +35,41 @@
 							</label>
 							<button id="verify_otp">Verify</button>						
 						</div>
-						<div class="input hidden">
+							<div class="input extra_settings hidden">
 							<label>
 								<span>Tracking: </span>
 								<label class="switch"><input type="checkbox" id="chk_tracking_status" value="on"> <div class="slider round"></div></label>
 							</label>
 						</div>
-						<div class="input hidden">
+						<div class="input extra_settings hidden">
 							<label>
 								<span>Mail Delay: </span>
 								<label class="switch"><input type="checkbox" id="chk_mail_delay" value="on"> <div class="slider round"></div></label>
 							</label>
 						</div>
-						<div class="input hidden">
+						<div class="input extra_settings hidden delay_time_input">
 							<label>
 								<span>Delay Seconds</span>
-								<input type="number" min="1" max="5">
+								<input type="number" min="1" max="5" id="mail_delay_time">
 							</label>
 						</div>
-						<div class="input hidden">
+						<div class="input extra_settings hidden">
+							<label>
+								<span>Show Notifications: </span>
+								<label class="switch"><input type="checkbox" id="chk_show_notifs" value="on">
+									<div class="slider round"></div>
+								</label>
+							</label>
+						</div>
+						<div class="input extra_settings hidden">
 							<label>
 								<span>Timezone:</span>
-								<select>
-									<option v-for="timezone in timezones">{{timezone}}</option>
+								<select id="timezone_setting">
 								</select>
 							</label>
 						</div>
-						<div class="input hidden">
-							<button class="long">Save Settings</button>
+						<div class="input extra_settings hidden">
+							<button class="long" id="save_settings">Save Settings</button>
 						</div>
 					</div>
 				</fieldset>
