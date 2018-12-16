@@ -75,6 +75,10 @@ footer{
 	opacity:0;
 	pointer-events:none;
 }
+.input label>span{
+	display:inline-block;
+	min-width:150px;
+}
 /* The switch - the box around the slider */
 .switch {
 	display: inline-block;
@@ -234,6 +238,8 @@ table .time{
 	max-width:80%;
 	min-height:50%;
 	max-height:80%;
+	height:80%;
+	overflow-y:auto;
 	z-index:11;
 	transform:translate(-50%,-50%);
 	opacity:0;
@@ -268,4 +274,25 @@ table .time{
 	margin-bottom: 20px;
 	text-align: center;
 	font-size: 24px;
+}
+.footer_menu a{
+	color:#9068be;
+}
+.announcement{
+	padding: 10px 20px;
+	margin-bottom: 30px;
+	border-radius: 10px;
+	position:relative;
+	display:none;
+}
+.announcement .dismiss {
+	position: absolute;
+	right:5px;
+	top:5px;
+	cursor:pointer;
+}
+.announcement-info {
+	color:#8a6d3b;
+	border:1px solid #faebcc;
+	background:#fcf8e3;
 }

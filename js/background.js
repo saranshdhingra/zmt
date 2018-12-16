@@ -42,7 +42,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 			hashes.push(request.hash);
 		zmt_settings.hashes=hashes;
 		chrome.storage.local.set({
-			zmt_settings: zmt_settings
+			zmt_settings: JSON.stringify(zmt_settings)
 		},function(){
 			sendResponse({});
 		});

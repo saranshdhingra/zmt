@@ -135,6 +135,16 @@ jQuery(document).ready(function($){
 			}
 		}
 	});
+
+	//dismiss button on the alerts
+	$(".announcement").find(".dismiss").on("click", function (e) {
+		e.preventDefault();
+		$(this).parent(".announcement").slideUp(function () {
+			chrome.storage.local.set({
+				'alert_dismissed':true
+			},function(){});
+		});
+	});
 });
 
 function update_settings(do_refresh,cb){
@@ -150,7 +160,7 @@ function update_settings(do_refresh,cb){
 
 function refresh_settings(){
 	chrome.storage.local.get("zmt_settings", function (result) {
-		console.log(result);
+		// console.log(result);
 		if(result.zmt_settings!==undefined){
 			console.log(result.zmt_settings);
 			window.settings = JSON.parse(result.zmt_settings);
@@ -243,6 +253,14 @@ function refresh_settings(){
 				show_modal(html,'success','Success!');
 			});
 		});
+	});
+
+	//
+	chrome.storage.local.get('alert_dismissed',function(result){
+		console.log(result);
+		if(!result.alert_dismissed){
+			$(".announcement").slideDown();
+		}
 	});
 }
 
