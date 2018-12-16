@@ -14,12 +14,8 @@
 	"options_page": "options.html",
 	"homepage_url": "https://zohomailtracker.com",
 	"web_accessible_resources": [
-	    "images/mail_icon.svg",
-	    "images/muted.png",
-	    "images/unmuted.png",
-	    "images/icon_notif.png",
-	    "fonts/Roboto-Regular.woff",
-	    "fonts/Roboto-Medium.woff"
+		"images/tracker_inserted.png",
+		"images/tracker_failed.png"
 	],
 	"permissions":[
 		"storage"

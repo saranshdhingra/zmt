@@ -57,13 +57,6 @@ function refresh_settings(){
 //function that checks that the send button exists in the DOM.
 //if recurse is true and there is not send btn(near the el) , it will keep calling itself recursively.
 function check_send_btn(el, recurse) {
-	//if settings were not found,
-	//or if mail tracking is switched off,
-	//or if the user is not verified,
-	//then don't do anything!
-	if (!zmt_settings || !zmt_settings.mail_tracking)
-		return;
-
 	if (el.parents(".SC_mclst.zmCnew").find(".SCtxt[data-event='s']").length == 0) {
 		//if you want to recurse
 		if (recurse)
@@ -81,14 +74,37 @@ function check_send_btn(el, recurse) {
 //basically our fake button
 function replace_send_btn(el) {
 	var send_btn = el.parents(".SC_mclst.zmCnew").find(".SCtxt[data-event='s']"),
-		tracking_str = (zmt_settings && zmt_settings.mail_tracking) ? "<ul class='zmt_tracking_status'><li>Tracker will be inserted on 'Send'</li></ul>" : "<ul class='zmt_tracking_status'><li>Tracker won't be inserted!</li></ul>";
+		parent = send_btn.parents(".SC_flt"),
+		tracking_str;
+		
+	if(zmt_settings && zmt_settings.mail_tracking && zmt_settings.user && zmt_settings.user.verified){
+		tracking_str=`<ul class='zmt_tracking_status'><li><img src='${chrome.extension.getURL('images/tracker_inserted.png')}' data-tooltip="Tracker will be inserted on 'Send'"></li></ul>`;
+		
+		//so that I can replace it back!
+		send_btn.attr("data-zmt_event", "s").removeAttr("data-event");
+	}
 
-	//so that I can replace it back!
-	send_btn.attr("data-zmt_event", "s").removeAttr("data-event");
+	//if settings were not found,
+	//or if mail tracking is switched off,
+	//or if the user is not verified,
+	//then simply add a visual to show the user that we won't be tracking this mail
+	else{
+		let failed_reason = "";
+		if (!zmt_settings)
+			failed_reason = "Could not load saved settings!";
+		else if (!zmt_settings.user)
+			failed_reason = "User is not logged in!";
+		else if (!zmt_settings.user.verified)
+			failed_reason = "User is not verified!";
+		else if (!zmt_settings.mail_tracking)
+			failed_reason = "Mail tracking is switched off!";
 
-	//add an info about tracking status
-	var parent = send_btn.parents(".SC_flt");
-	console.log(parent.find(".zmt_tracking_status").length);
+		failed_reason = `Tracker will not be inserted because ${failed_reason}`;
+			
+		tracking_str = `<ul class='zmt_tracking_status'><li><img src='${chrome.extension.getURL('images/tracker_failed.png')}' data-tooltip='${failed_reason}'></li></ul>`;
+	}
+
+	//just to show the current info of tracking status!
 	if (parent.find(".zmt_tracking_status").length == 0) {
 		parent.append(tracking_str);
 	}
