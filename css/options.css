@@ -58,6 +58,7 @@ footer{
 }
 #tab_contents .tab_content{
 	display:none;
+	padding:40px;
 }
 #tab_contents .tab_content.active{
 	display:block;
@@ -186,4 +187,85 @@ button.hidden{
 }
 #response .failure {
 	color: #ea5f5f;
+}
+/*History*/
+#history_div{
+	overflow:auto;
+}
+table{
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+table td{
+	border:1px solid #ddd;
+	padding:10px 20px;
+}
+table thead td{
+	background:#1a1f25;
+	color:#fff;
+}
+table tbody td{
+	color:#666;
+	background:#fff;
+}
+table tbody tr:nth-child(odd) td{
+	background:#ebebeb;
+}
+table .time{
+	white-space:nowrap;
+}
+#modal{
+	position:fixed;
+	left:0;
+	top:0;
+	width:100%;
+	height:100%;
+	z-index:10;
+	background:rgba(0,0,0,.8);
+	pointer-events:none;
+	opacity:0;
+	transition:all .4s ease-out;
+}
+#modal_inner{
+	position:fixed;
+	left:50%;
+	top:50%;
+	min-width:50%;
+	max-width:80%;
+	min-height:50%;
+	max-height:80%;
+	z-index:11;
+	transform:translate(-50%,-50%);
+	opacity:0;
+	pointer-events:none;
+	background:#fff;
+	padding:20px;
+	transition:all .4s ease-out;
+}
+#modal_outer{
+	position:absolute;
+	left:0;
+	top:0;
+	width:100%;
+	height:100%;
+	z-index:10;
+}
+#modal.visible{
+	opacity:1;
+	pointer-events:all;
+}
+#modal.visible #modal_inner{
+	opacity:1;
+	pointer-events:all;
+}
+#modal .modal_close{
+	position: absolute;
+	right:10px;
+	top:10px;
+	cursor:pointer;
+}
+#modal_inner .email_subject{
+	margin-bottom: 20px;
+	text-align: center;
+	font-size: 24px;
 }

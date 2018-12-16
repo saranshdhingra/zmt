@@ -4,6 +4,7 @@
 <head>
 	<title>Options | ZMT by Crazy Ripples</title>
 	<link rel="stylesheet" href="css/options.css">
+	<!-- <link rel="stylesheet" href="css/sweetalert-2.min.css"> -->
 </head>
 <body>
 	<div id="root">
@@ -11,6 +12,7 @@
 			<div class="logo"><a href="" target="_blank"><img src="images/logo64.png"></a></div>
 			<div class="menu">
 				<span><a href="#" class="active">Settings</a></span>
+				<span><a href="#">History</a></span>
 				<span><a href="#">FAQs</a></span>
 				<span><a href="#">Changelog</a></span>
 				<span><a href="#">Contact</a></span>
@@ -43,18 +45,6 @@
 						</div>
 						<div class="input extra_settings hidden">
 							<label>
-								<span>Mail Delay: </span>
-								<label class="switch"><input type="checkbox" id="chk_mail_delay" value="on"> <div class="slider round"></div></label>
-							</label>
-						</div>
-						<div class="input extra_settings hidden delay_time_input">
-							<label>
-								<span>Delay Seconds</span>
-								<input type="number" min="1" max="5" id="mail_delay_time">
-							</label>
-						</div>
-						<div class="input extra_settings hidden">
-							<label>
 								<span>Show Notifications: </span>
 								<label class="switch"><input type="checkbox" id="chk_show_notifs" value="on">
 									<div class="slider round"></div>
@@ -75,7 +65,30 @@
 				</fieldset>
 			</div>
 			<div class="tab_content">
-				FAQs content
+				<h3>History</h3>
+				<div id="history_div">
+					<table id="history_table">
+						<thead>
+							<tr>
+								<td>S.No.</td>
+								<td>Actions</td>
+								<td>Subject</td>
+								<td>Total Views</td>
+								<td>Sent <strong>To</strong></td>
+								<td>CC</td>
+								<td>BCC</td>
+							</tr>
+						</thead>
+						<tbody>
+
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="tab_content">
+				<fieldset>
+					<legend>FAQs content</legend>
+				</fieldset>
 			</div>
 			<div class="tab_content">
 				<div id="release_notes">
@@ -97,8 +110,16 @@
 				<span>Version: 2.0</span>
 			</div>
 		</footer>
+		<div id="modal">
+			<div id="modal_outer" class="modal_close"></div>
+			<div id="modal_inner">
+				<div class="modal_close">X</div>
+				<div id="modal_content"></div>
+			</div>
+		</div>
 	</div>
 	<script src="js/jquery-3.3.1.min.js"></script>
+	<!-- <script src="js/sweetalert-2.min.js"></script> -->
 	<script src="js/options.js"></script>
 </body>
 </html>

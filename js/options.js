@@ -1,8 +1,6 @@
 var settings = settings = {
 		'user': false,
 		'mail_tracking': false,
-		'mail_delay': false,
-		'mail_delay_time': 3,
 		'show_notifications':true,
 		'timezone': 'GMT'
 	},
@@ -84,13 +82,6 @@ jQuery(document).ready(function($){
 		});
 	});
 
-	$("#chk_mail_delay").on("change",function(){
-		if($(this).prop("checked"))
-			$(".delay_time_input").removeClass("hidden");
-		else
-			$(".delay_time_input").addClass("hidden");
-	});
-
 	$("#save_settings").on("click",function(){
 		//show notifications?
 		if ($("#chk_show_notifs").prop("checked"))
@@ -103,21 +94,6 @@ jQuery(document).ready(function($){
 			settings.mail_tracking = true;
 		else
 			settings.mail_tracking = false;
-		
-
-		//mail delay
-		if ($("#chk_mail_delay").prop("checked"))
-			settings.mail_delay = true;
-		else
-			settings.mail_delay = false;
-
-		//delay_time
-		var delay_time = $("#mail_delay_time").val();
-		if (isNaN(delay_time) || delay_time == 0)
-			delay_time = 3;
-
-		settings.mail_delay_time = delay_time;
-
 
 		$.post(base_url + "user/update_timezone", {
 			timezone : $("#timezone_setting").val(),
@@ -127,6 +103,37 @@ jQuery(document).ready(function($){
 			settings.timezone = $("#timezone_setting").val();
 			update_settings();
 		});
+	});
+
+	//Tabs
+	$(".menu").find("a").on("click",function(e){
+		e.preventDefault();
+		if($(this).hasClass("active") || $(this).hasClass("logout"))
+			return;
+		
+		var index=$(this).index(".menu a");
+		console.log(index);
+		$(".menu").find("a").removeClass("active").eq(index).addClass("active");
+		// $(this).removeClass("active");
+
+		$("#tab_contents").find(".tab_content").removeClass("active").eq(index).addClass("active");
+	})
+
+	//modals
+	$(".modal_close").on("click",function(){
+		$("#modal").removeClass("visible");
+		setTimeout(function(){
+			$("#modal_content").html("");
+		},600);
+	});
+
+	//detect escape key
+	$(document).keyup(function (e) {
+		if (e.key === "Escape") {
+			if($("#modal").hasClass("visible")){
+				$(".modal_close").first().trigger("click");
+			}
+		}
 	});
 });
 
@@ -182,17 +189,6 @@ function refresh_settings(){
 			$("#chk_tracking_status").prop("checked", false);
 		}
 
-		if (settings.mail_delay) {
-			$("#chk_mail_delay").prop("checked", true);
-			$(".delay_time_input").removeClass("hidden");
-		} else {
-			$(".delay_time_input").addClass("hidden");
-			$("#chk_mail_delay").prop("checked", false);
-		}
-
-		var delay_time=(settings.mail_delay_time===undefined)?3:settings.mail_delay_time;
-		$("#mail_delay_time").val(delay_time);
-
 		if(settings.show_notifications){
 			$("#chk_show_notifs").prop("checked",true);
 		}
@@ -202,6 +198,84 @@ function refresh_settings(){
 
 		var selected_tz=settings.timezone===undefined?"GMT":settings.timezone
 		$("#timezone_setting").find("option[value='" + selected_tz + "']").attr("selected",true);
+
+		load_history();
+
+		$("body").on("click", ".show_email_views",function(e){
+			e.preventDefault();
+			var hash=$(this).attr("data-email");
+			$.post(base_url + `emails/${hash}/details`, {
+				api_token: settings.user.api_token
+			}, function (response) {
+				let html=`
+					<div class='email_subject'><strong>Email: </strong> ${response.subject}</div>
+					<table class="email_views">
+						<thead>
+							<tr>
+								<td>S.No.</td>
+								<td>IP</td>
+								<td>Device</td>
+								<td>Location</td>
+								<td>User Agent</td>
+								<td>Time</td>
+							</tr>
+						</thead>
+						<tbody>
+				`;
+				if(response.details.length==0)
+					html+="<tr><td colspan=5>This email hasn't been viewed yet!</td></tr>";
+				else{
+					for(let i=0;i<response.details.length;i++){
+						let row=response.details[i];
+						html+=`
+							<tr class="email_view">
+								<td>${(i+1)}</td>
+								<td>${row.user_ip}</td>
+								<td>${row.device}</td>
+								<td>${row.location}</td>
+								<td>${row.user_agent}</td>
+								<td><div class="time">${row.viewed_at}</div></td>
+							</tr>
+						`;
+					}
+				}
+				html+=`</tbody></table>`;
+				show_modal(html,'success','Success!');
+			});
+		});
+	});
+}
+
+function load_history(){
+	if(!settings.user || !settings.user.verified || !settings.user.api_token){
+		$("#history_div").html("<tr><td colspan=7>You need to log in before seeing the history!</td></tr>");
+		return;
+	}
+
+	$.post(base_url + "user/history", {
+		api_token:settings.user.api_token
+	}, function (response) {
+		console.log(response);
+		if(!response.history || response.history.length==0){
+			$("#history_table").find("tbody").html("<tr><td colspan=7>No emails being tracked!</td></tr>");
+			return;
+		}
+
+		var html="";
+		for(let i=0;i<response.history.length;i++){
+			let row=response.history[i];
+			html+=`<tr>
+						<td>${(i+1)}</td>
+						<td><a href='#' data-email='${row.hash}' class='show_email_views'>Details</a></td>
+						<td>${row.subject}</td>
+						<td>${row.views_count}</td>
+						<td>${row.to_field}</td>
+						<td>${row.cc_field}</td>
+						<td>${row.bcc_field}</td>
+					</tr>`;
+		}
+		$("#history_table").find("tbody").html(html);
+
 	});
 }
 
@@ -211,5 +285,11 @@ function is_email_valid(email){
 }
 
 function show_errors(str){
+	// show_modal(str,'error','Errors!');
 	alert(str);
+}
+
+function show_modal(str,type,title){
+	$("#modal_content").html(str);
+	$("#modal").addClass("visible");
 }
