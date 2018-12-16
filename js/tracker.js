@@ -1,6 +1,6 @@
 var zmt_token,
 	doc_user_email,
-	base_url = "https://zmt.abc/api/v2/",
+	base_url = "https://zohomailtracker.com/api/v2/",
 	zmt_settings,
 	zoho_patt = new RegExp("^mail\.zoho\.[a-z]+$");
 
@@ -48,7 +48,7 @@ jQuery(document).ready(function($){
 function refresh_settings(){
 	chrome.storage.local.get("zmt_settings", function (result) {
 		if (result.zmt_settings !== undefined) {
-			console.log(result.zmt_settings);
+			// console.log(result.zmt_settings);
 			window.zmt_settings = JSON.parse(result.zmt_settings);
 		}
 	});
@@ -139,7 +139,7 @@ function remove_current_pixels_from_mail(mail_body) {
 	var imgs = mail_body.contents().find('img').filter(function () {
 		var src = $(this).attr("src");
 		//src was sometimes undefined
-		if (typeof src != "undefined" && src.match(/https:\/\/zmt\.abc\/api\/v2\/img\?hash=\w+/)){
+		if (typeof src != "undefined" && src.match(/https:\/\/zohomailtracker\.com\/api\/v2\/img\?hash=\w+/)){
 			$(this).remove();
 		}
 	});
