@@ -223,7 +223,7 @@ function refresh_settings(){
 						<tbody>
 				`;
 				if(response.details.length==0)
-					html+="<tr><td colspan=5>This email hasn't been viewed yet!</td></tr>";
+					html+="<tr><td colspan=6 style='text-align:center;'>This email hasn't been viewed yet!</td></tr>";
 				else{
 					for(let i=0;i<response.details.length;i++){
 						let row=response.details[i];
