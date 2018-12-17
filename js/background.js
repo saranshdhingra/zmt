@@ -18,6 +18,13 @@ chrome.runtime.onInstalled.addListener(function () {
 	});
 });
 
+//open options page on Icon click
+chrome.browserAction.onClicked.addListener(function (tab) {
+	chrome.tabs.create({
+		url: "options.html"
+	});
+});
+
 //this makes sure that users don't trigger a 'view' when they see the image themeselves.
 chrome.webRequest.onBeforeRequest.addListener(function (info) {
 	var hash = getParameterByName("hash", info.url);
@@ -34,23 +41,27 @@ chrome.webRequest.onBeforeRequest.addListener(function (info) {
 //this should take care of things like dynamically adding hashes to our whitelist
 //need to refresh zmt_settings here
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-	//add_hash is recieved when a new hash is supposed to be added in our whitelist
-	if (request.action == "add_hash") {
-		let hash=request.hash;
-		hashes=zmt_settings.hashes===undefined?[]:zmt_settings.hashes;
-		if(hashes.indexOf(hash)==-1)
-			hashes.push(request.hash);
-		zmt_settings.hashes=hashes;
-		chrome.storage.local.set({
-			zmt_settings: JSON.stringify(zmt_settings)
-		},function(){
-			sendResponse({});
-		});
-	}
-	// else if (request.action == "settings_changed") {
-	// 	refresh_settings();
-	// 	sendResponse({});
-	// }
+
+	//it is important to refresh the settings before we add the hash to local.
+	refresh_settings(function(){
+		//add_hash is recieved when a new hash is supposed to be added in our whitelist
+		if (request.action == "add_hash") {
+			let hash = request.hash;
+			hashes = zmt_settings.hashes === undefined ? [] : zmt_settings.hashes;
+			if (hashes.indexOf(hash) == -1)
+				hashes.push(request.hash);
+			zmt_settings.hashes = hashes;
+			chrome.storage.local.set({
+				zmt_settings: JSON.stringify(zmt_settings)
+			}, function () {
+				sendResponse({});
+			});
+		}
+		// else if (request.action == "settings_changed") {
+		// 	refresh_settings();
+		// 	sendResponse({});
+		// }
+	});
 });
 
 //function that gets a parameter value by name from a query string
@@ -68,10 +79,13 @@ function getParameterByName(name, url) {
 }
 
 //function that simply gets the settings and stores them
-function refresh_settings() {
+function refresh_settings(callback) {
 	chrome.storage.local.get("zmt_settings", function (result) {
 		if (result.zmt_settings !== undefined) {
 			window.zmt_settings = JSON.parse(result.zmt_settings);
 		}
+
+		if(callback!==undefined)
+			callback();
 	});
 }
