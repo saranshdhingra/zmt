@@ -14,6 +14,10 @@ chrome.runtime.onInstalled.addListener(function () {
 			chrome.storage.local.set({
 				'last_seen_version': cur_version
 			}, function () {});
+		}else{
+			chrome.browserAction.setBadgeText({
+				text: ''
+			});
 		}
 	});
 });
