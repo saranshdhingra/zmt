@@ -1,5 +1,6 @@
 var zmt_token,
 	doc_user_email,
+	needs_reload=false,
 	base_url = "https://zohomailtracker.com/api/v2/",
 	zmt_settings,
 	zoho_patt = new RegExp("^mail\.zoho\.[a-z]+$");
@@ -10,7 +11,7 @@ jQuery(document).ready(function($){
 	if (!zoho_patt.test(window.location.host)) {
 		return;
 	}
-	console.log("injected");
+	// console.log("injected");
 
 	refresh_settings(function(){
 		// check_doc_email();
@@ -41,6 +42,12 @@ jQuery(document).ready(function($){
 			send_mail($(this));
 		}
 	});
+
+	//we call this repetitively so that hypothetically, if a person is writing a mail and the extension updates, it won't be able to insert a tracker.
+	//So, we update the user using our visuals!
+	setInterval(function(){
+		check_page_needs_reload();
+	},5000);
 
 });
 
@@ -77,7 +84,7 @@ function replace_send_btn(el) {
 		parent = send_btn.parents(".SC_flt"),
 		tracking_str;
 		
-	if(zmt_settings && zmt_settings.mail_tracking && zmt_settings.user && zmt_settings.user.verified){
+	if (zmt_settings && zmt_settings.mail_tracking && zmt_settings.user && zmt_settings.user.verified &&  !window.needs_reload) {
 		tracking_str=`<ul class='zmt_tracking_status'><li><img src='${chrome.extension.getURL('images/tracker_inserted.png')}' data-tooltip="Tracker will be inserted on 'Send'"></li></ul>`;
 		
 		//so that I can replace it back!
@@ -98,8 +105,10 @@ function replace_send_btn(el) {
 			failed_reason = "User is not verified!";
 		else if (!zmt_settings.mail_tracking)
 			failed_reason = "Mail tracking is switched off!";
+		else if (window.needs_reload)
+			failed_reason = "The page needs a reload!";
 
-		failed_reason = `Tracker will not be inserted because ${failed_reason}`;
+		failed_reason = `Tracker will not be inserted because <strong>${failed_reason}</strong>`;
 			
 		tracking_str = `<ul class='zmt_tracking_status'><li><img src='${chrome.extension.getURL('images/tracker_failed.png')}' data-tooltip='${failed_reason}'></li></ul>`;
 	}
@@ -228,4 +237,26 @@ function send_mail(btn) {
 }
 
 function check_doc_email(){
+}
+
+//we don't need to rely on the asynchronous nature of sendMessage because
+//if we chrome.runtime is available, then we simply return true.
+//If it is not available and it hit an exception, we return false
+function check_page_needs_reload(){
+	try{
+		chrome.runtime.sendMessage({
+			action: 'checking_connection'
+		}, function () {
+		});
+	}
+	catch(err){
+		//display the visual
+		$(".zmt_tracking_status").each(function(){
+			$(this).find("li").html(`<img src='${chrome.extension.getURL('images/tracker_failed.png ')}'data-tooltip='Tracker will not be inserted because <strong>The page needs a reload</strong>!'>`);
+		});
+		//remove the tracker handler
+		$("[data-zmt_event='s']").removeAttr("data-zmt_event").attr("data-event","s");
+		window.needs_reload=true;
+	}
+	window.needs_reload=false;
 }
