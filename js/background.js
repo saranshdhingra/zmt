@@ -11,13 +11,7 @@ chrome.runtime.onInstalled.addListener(function () {
 			chrome.browserAction.setBadgeText({
 				text: 'NEW'
 			});
-			chrome.storage.local.set({
-				'last_seen_version': cur_version
-			}, function () {});
-		}else{
-			chrome.browserAction.setBadgeText({
-				text: ''
-			});
+			
 		}
 	});
 });
