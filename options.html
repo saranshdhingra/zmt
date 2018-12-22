@@ -47,14 +47,14 @@
 								<label class="switch"><input type="checkbox" id="chk_tracking_status" value="on"> <div class="slider round"></div></label>
 							</label>
 						</div>
-						<div class="input extra_settings hidden">
+						<div class="input extra_settings hidden" id="notifications_setting">
 							<label>
 								<span>Show Notifications: </span>
 								<label class="switch"><input type="checkbox" id="chk_show_notifs" value="on">
 									<div class="slider round"></div>
 								</label>
 							</label>
-							<em>This will likely take effect on the next update(by this week's end!)</em>
+							<span class="error hidden"></span>
 						</div>
 						<div class="input extra_settings hidden">
 							<label>
@@ -140,8 +140,11 @@
 			</div>
 		</div>
 	</div>
+	<script src="js/environment.js"></script>
 	<script src="js/jquery-3.3.1.min.js"></script>
-	<!-- <script src="js/sweetalert-2.min.js"></script> -->
+	<script src="js/firebase-5.7.0-app.js"></script>
+	<script src="js/firebase-5.7.0-messaging.js"></script>
+	<script src="firebase-messaging-sw.js"></script>
 	<script src="js/options.js"></script>
 </body>
 </html>
