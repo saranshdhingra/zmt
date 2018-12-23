@@ -13,6 +13,7 @@
 			<div class="menu">
 				<span><a href="#" class="active">Settings</a></span>
 				<span><a href="#">History</a></span>
+				<span><a href="#">FAQ</a></span>
 				<span><a href="#">Changelog</a></span>
 				<span><a href="#">Contact</a></span>
 				<span><a href="#" class="logout">Logout</a></span>
@@ -89,6 +90,41 @@
 						</tbody>
 					</table>
 				</div>
+			</div>
+			<div class="tab_content">
+				<h3>FAQ</h3>
+				<ul class="accordion">
+					<li>
+						<h4>How is the tracking accomplished?</h4>
+						<p>This is actually a common technique used by most tracking software. This is used by all big players like <strong>Mailchimp</strong>,
+						<strong>Mailgun</strong>, and any other provide that gives you the tracking feature. Even <strong>Zoho</strong> uses this in their campaign emails.</p>
+						<p>We simply insert an image inside your mail which when loaded, tells that the email has been read.</p>
+					</li>
+					<li>
+						<h4>Sometimes a user has viewed an email but I can't see that in the list!</h4>
+						<p>As explained above, we insert an 1x1 px image inside your email. To be able to record if the email has been opened, that image will have to be loaded. So, a common scenario is if the recepient has turned off images for your emails then we won't be able to record it!</p>
+					</li>
+					<li>
+						<h4>How accurately do you display the IP address, location etc?</h4>
+						<p>The techniques used to get this info is pretty standard. If a person is behind a proxy, the IP adress will obviously be wrong. Similarly, there are limitations to get location, device info etc. Whatever info I can record, I am displaying to you!</p>
+					</li>
+					<li>
+						<h4>Are you recording my email contents?</h4>
+						<p><strong>Ceratinly NOT!</strong> We only record handful of data like the "To field", "CC field", "BCC field" and "Subject" of the email. Without this information it will be hard to identify the email for you!</p>
+					</li>
+					<li>
+						<h4>If I open my own email, I don't get a notification, why?</h4>
+						<p>If you are testing the functionality of the extension, I recommend you to open your emails in another browser, because we try not to count your own opening as a <em>'view'</em>. If we were to record your own opens, it will be highly inaccurate!</p>
+					</li>
+					<li>
+						<h4>Sometimes, I can't send an email because of your extension!</h4>
+						<p>While we try to test the functionality heavily before releasing, we can't anticipate all the variables like DNS failures etc. If the extension is causing you trouble I will sincerely ask you to contact me and I will try to resolve your issue on an immediate basis.</p>
+					</li>
+					<li>
+						<h4>What about Android, iOS apps?</h4>
+						<p>There is an Android app, but its being revamped. So far, we have not started work on an iOS app!</p>
+					</li>
+				</ul>
 			</div>
 			<div class="tab_content">
 				<div id="release_notes">

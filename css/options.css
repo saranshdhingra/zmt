@@ -150,6 +150,32 @@ input[type="number"] {
 	height: 30px;
 	text-align: center;
 }
+.accordion{
+	list-style: none;
+	padding-left: 0;
+	width: 80%;
+}
+.accordion h4{
+	cursor:pointer;
+	color:#8e8e8e;
+	border-bottom:1px solid #ccc;
+	padding:5px 10px;
+	font-weight:400;
+}
+.accordion h4:after{
+	content:'';
+	width:10px;
+	height:10px;
+	border-right:1px solid #ccc;
+	border-bottom:1px solid #ccc;
+	transform:rotate(45deg);
+	float:right;
+	margin-right:20px;
+	margin-left:20px;
+}
+.accordion p{
+	display:none;
+}
 
 /* Rounded sliders */
 .slider.round {

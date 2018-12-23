@@ -193,6 +193,11 @@ jQuery(document).ready(function($){
 			},function(){});
 		});
 	});
+
+	//accordion
+	$("body").on("click",".accordion h4",function(){
+		$(this).siblings("p").slideToggle();
+	});
 });
 
 function update_settings(do_refresh,cb){
