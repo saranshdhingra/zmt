@@ -87,3 +87,21 @@ function refresh_settings(callback) {
 			callback();
 	});
 }
+
+// firebase.initializeApp(env.firebaseConfig);
+// window.messaging = firebase.messaging();
+// window.messaging.usePublicVapidKey(env.publicVapidKey);
+
+if ('serviceWorker' in navigator && 'PushManager' in window) {
+	console.log('Service Worker and Push is supported');
+
+	navigator.serviceWorker.register('../firebase-messaging-sw.js')
+		.then(function (swReg) {
+			console.log('Service Worker is registered', swReg);
+		})
+		.catch(function (error) {
+			console.error('Service Worker Error', error);
+		});
+} else {
+	console.warn('Push messaging is not supported');
+}

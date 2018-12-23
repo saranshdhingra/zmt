@@ -21,7 +21,8 @@
 		"storage",
 		"webRequest",
 		"webRequestBlocking",
-		"*://zohomailtracker.com/*"
+		"*://zohomailtracker.com/*",
+		"notifications"
 	],
 	"content_scripts": [{
 		"matches": ["<all_urls>"],
@@ -29,7 +30,7 @@
 		"run_at": "document_end"
 	}],
 	"background": {
-		"scripts": ["js/background.js"],
+		"scripts": ["js/environment.js","js/pubnub.js","js/background.js"],
 		"persistent": true
 	},
 	"browser_action":{}

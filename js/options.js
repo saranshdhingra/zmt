@@ -94,8 +94,8 @@ jQuery(document).ready(function($){
 	});
 
 	$("#chk_show_notifs").on("change",function(){
-		if($(this).prop("checked")=="1")
-			getFcmPermissions();
+		// if($(this).prop("checked")=="1")
+			// getFcmPermissions();
 	});
 
 	$("#save_settings").on("click",function(){
@@ -161,74 +161,123 @@ jQuery(document).ready(function($){
 		});
 	});
 
-	firebase.initializeApp(env.firebaseConfig);
-	window.messaging = firebase.messaging();
-	window.messaging.usePublicVapidKey(env.publicVapidKey);
-	getFcmPermissions();
+	// firebase.initializeApp(env.firebaseConfig);
+	// window.messaging = firebase.messaging();
+	// window.messaging.usePublicVapidKey(env.publicVapidKey);
+	// getFcmPermissions();
 
-	window.messaging.onTokenRefresh(function () {
-		messaging.getToken().then(function (token) {
-			// console.log('Token refreshed.');
-			// console.log(token);
-			send_token_to_server(token, function (response) {
-				if (response.code == "1") {
-					window.settings.push_token = token;
-					window.settings.show_notifications = true;
-					$("#notifications_setting").find(".error").html("").addClass("hidden");
-				} else {
-					window.settings.show_notifications = false;
-					delete window.settings.push_token;
-					$("#notifications_setting").find(".error").html("Refresh of FCM token failed, please try again!").removeClass("hidden");
-				}
-				update_settings();
-			});
-		}).catch(function (err) {
-			window.settings.show_notifications = false;
-			delete window.settings.push_token;
-			$("#notifications_setting").find(".error").html("Could not get FCM token, please try again!").removeClass("hidden");
-			update_settings();
-		});
+	// window.messaging.onTokenRefresh(function () {
+	// 	messaging.getToken().then(function (token) {
+	// 		// console.log('Token refreshed.');
+	// 		// console.log(token);
+	// 		send_token_to_server(token, function (response) {
+	// 			if (response.code == "1") {
+	// 				window.settings.push_token = token;
+	// 				window.settings.show_notifications = true;
+	// 				$("#notifications_setting").find(".error").html("").addClass("hidden");
+	// 			} else {
+	// 				window.settings.show_notifications = false;
+	// 				delete window.settings.push_token;
+	// 				$("#notifications_setting").find(".error").html("Refresh of FCM token failed, please try again!").removeClass("hidden");
+	// 			}
+	// 			update_settings();
+	// 		});
+	// 	}).catch(function (err) {
+	// 		window.settings.show_notifications = false;
+	// 		delete window.settings.push_token;
+	// 		$("#notifications_setting").find(".error").html("Could not get FCM token, please try again!").removeClass("hidden");
+	// 		update_settings();
+	// 	});
+	// });
+
+	// window.messaging.onMessage(function (payload) {
+	// 	console.log('Message received. ', payload);
+	// 	chrome.notifications.create("from_options",{
+	// 		type:'basic',
+	// 		iconUrl:'images/icon_notif.png',
+	// 		title:'From Options',
+	// 		message:'Test msg',
+	// 		priority: 1
+	// 	});
+	// 	console.log("Last error:", chrome.runtime.lastError);
+	// });
+
+	//pubnub
+	var pubnub = new PubNub({
+		subscribeKey: env.pubnub.subscribeKey,
+		ssl: true
+	})
+
+
+	pubnub.addListener({
+		status: function (statusEvent) {
+			console.log("status",statusEvent);
+			// if (statusEvent.category === "PNConnectedCategory") {
+			// 	var payload = {
+			// 		my: 'payload'
+			// 	};
+			// 	pubnub.publish({
+			// 			message: payload
+			// 		},
+			// 		function (status) {
+			// 			// handle publish response
+			// 		}
+			// 	);
+			// }
+		},
+		message: function (message) {
+			// handle message
+			console.log("message",message);
+		},
+		presence: function (presenceEvent) {
+			// handle presence
+			console.log("presence",presence);
+		}
+	});
+
+	pubnub.subscribe({
+		channels: ['my_channel'],
 	});
 });
 
-function getFcmPermissions(){
-	window.messaging.requestPermission().then(function () {
-		//the user has given access
-		window.messaging.getToken().then(function(token){
-			if(token){
-				console.log(token);
-				send_token_to_server(token,function(response){
-					if(response.code=="1"){
-						window.settings.push_token = token;
-						window.settings.show_notifications = true;
-						$("#notifications_setting").find(".error").html("").addClass("hidden");
-					}
-					else{
-						window.settings.show_notifications = false;
-						delete window.settings.push_token;
-						$("#notifications_setting").find(".error").html("Could not get FCM token, please try again!").removeClass("hidden");
-					}
-					update_settings();
-				});
-			} else {
-				window.settings.show_notifications=false;
-				delete window.settings.push_token;
-				$("#notifications_setting").find(".error").html("Could not get FCM token, please try again!").removeClass("hidden");
-				update_settings();
-			}
-		}).catch(function (err) {
-			window.settings.show_notifications = false;
-			delete window.settings.push_token;
-			$("#notifications_setting").find(".error").html("Could not get FCM token, please try again!").removeClass("hidden");
-			update_settings();
-		});
-	}).catch(function(err){
-		delete window.settings.push_token;
-		window.settings.show_notifications=false;
-		$("#notifications_setting").find(".error").html("Permissions blocked!").removeClass("hidden");
-		update_settings();
-	});
-}
+// function getFcmPermissions(){
+// 	window.messaging.requestPermission().then(function () {
+// 		//the user has given access
+// 		window.messaging.getToken().then(function(token){
+// 			if(token){
+// 				console.log(token);
+// 				send_token_to_server(token,function(response){
+// 					if(response.code=="1"){
+// 						window.settings.push_token = token;
+// 						window.settings.show_notifications = true;
+// 						$("#notifications_setting").find(".error").html("").addClass("hidden");
+// 					}
+// 					else{
+// 						window.settings.show_notifications = false;
+// 						delete window.settings.push_token;
+// 						$("#notifications_setting").find(".error").html("Could not get FCM token, please try again!").removeClass("hidden");
+// 					}
+// 					update_settings();
+// 				});
+// 			} else {
+// 				window.settings.show_notifications=false;
+// 				delete window.settings.push_token;
+// 				$("#notifications_setting").find(".error").html("Could not get FCM token, please try again!").removeClass("hidden");
+// 				update_settings();
+// 			}
+// 		}).catch(function (err) {
+// 			window.settings.show_notifications = false;
+// 			delete window.settings.push_token;
+// 			$("#notifications_setting").find(".error").html("Could not get FCM token, please try again!").removeClass("hidden");
+// 			update_settings();
+// 		});
+// 	}).catch(function(err){
+// 		delete window.settings.push_token;
+// 		window.settings.show_notifications=false;
+// 		$("#notifications_setting").find(".error").html("Permissions blocked!").removeClass("hidden");
+// 		update_settings();
+// 	});
+// }
 
 function send_token_to_server(token,callback){
 	$.post(base_url+"user/devices/new",{
