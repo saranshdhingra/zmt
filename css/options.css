@@ -177,6 +177,42 @@ input[type="number"] {
 	display:none;
 }
 
+#app_notifs{
+	position: fixed;
+	right:0;
+	top:0;
+	padding:20px;
+	border-width:1px;
+	border-style:solid;
+	transform:translateX(100%);
+	transition: all .4s ease-out;
+}
+#app_notifs.visible{
+	transform:translateX(0);
+}
+#app_notifs.success{
+	background:#dff0d8;
+	border-color:#d0e9c6;
+	color:#3c763d;
+}
+#app_notifs.error{
+	background: #f2dede;
+	border-color: #ebcccc;
+	color: #a94442;
+}
+#app_notifs.info{
+	background: #fcf8e3;
+	border-color: #faf2cc;
+	color: #8a6d3b;
+}
+#app_notifs .close{
+	position: absolute;
+	left: 5px;
+	top: 5px;
+	cursor: pointer;
+	font-size: 14px;
+}
+
 /* Rounded sliders */
 .slider.round {
 	border-radius: 34px;

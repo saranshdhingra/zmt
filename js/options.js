@@ -6,7 +6,8 @@ var settings = {
 	},
 	messaging,
 	base_url = env.baseUrl,
-	timezones = helpers.timezones;
+	timezones = helpers.timezones,
+	alertCloseTimeoutHandle;
 jQuery(document).ready(function($){
 
 	//if we have arrived from clicking on the notification
@@ -43,6 +44,7 @@ jQuery(document).ready(function($){
 		e.preventDefault();
 		settings={};
 		update_settings();
+		show_alert("You have been logged out!","info");
 	});
 
 	//start the verification process
@@ -50,16 +52,16 @@ jQuery(document).ready(function($){
 		var email=$("#user_email").val();
 		//pre sending validation
 		if(!helpers.is_email_valid(email)){
-			show_errors("The email seems to be invalid!");
+			show_alert("The email seems to be invalid!","error");
 			return false;
 		}
 		$("#verify_email").attr("disabled",true);
 		
 		//start the OTP sending process
 		$.post(base_url+"user/login",{email:email},function(response){
-			console.log(response);
 			$("#verify_email").removeAttr("disabled");
 			settings.user={email:email};
+			show_alert(response.msg,"success");
 			update_settings();
 		});
 	});
@@ -68,10 +70,7 @@ jQuery(document).ready(function($){
 	$("#user_email").on("keypress",function(e){
 		if(e.which==13){
 			e.preventDefault();
-			if(!$("#verify_email").hasClass("hidden"))
-				$("#verify_email").trigger("click");
-			else if(!$("#change_email").hasClass("hidden"))
-				$("#change_email").trigger("click");
+			$("#verify_email").trigger("click");
 		}
 	});
 
@@ -100,8 +99,11 @@ jQuery(document).ready(function($){
 			otp: otp
 		}, function (response) {
 			console.log(response);
-			if(!response.user.api_token){
-				show_errors("Could not verify this user!");
+			if(response.code=="0"){
+				show_alert(response.msg, "error");
+			}
+			else if(!response.user || !response.user.api_token){
+				show_alert("Could not verify this user!","error");
 			}
 				settings.user.api_token=response.user.api_token;
 				settings.user.verified=true;
@@ -112,6 +114,8 @@ jQuery(document).ready(function($){
 				settings.timezone=response.user.timezone;
 			if(response.user.hashes)
 				settings.hashes=response.user.hashes;
+
+			show_alert("User verified!", "success");
 			update_settings();
 		});
 	});
@@ -125,7 +129,6 @@ jQuery(document).ready(function($){
 			},function(response){
 				if(response.code=="1"){
 					settings.user.channel=response.channel;
-					update_settings();
 				}
 			});
 		}
@@ -150,7 +153,9 @@ jQuery(document).ready(function($){
 		}, function (response) {
 			console.log(response);
 			settings.timezone = $("#timezone_setting").val();
-			update_settings();
+			update_settings(true,function(){
+				show_alert("Settings saved!", "success");
+			});
 		});
 	});
 
@@ -181,6 +186,9 @@ jQuery(document).ready(function($){
 			if($("#modal").hasClass("visible")){
 				$(".modal_close").first().trigger("click");
 			}
+			else if($("#app_notifs").hasClass("visible")){
+				$("#app_notifs").find(".close").trigger("click");
+			}
 		}
 	});
 
@@ -192,6 +200,11 @@ jQuery(document).ready(function($){
 				'alert_dismissed':true
 			},function(){});
 		});
+	});
+
+	//options page notifications
+	$("#app_notifs").find(".close").on("click",function(){
+		$("#app_notifs").removeClass(["visible","success","error","info"]);
 	});
 
 	//accordion
@@ -356,9 +369,17 @@ function load_history(){
 	});
 }
 
-function show_errors(str){
-	// show_modal(str,'error','Errors!');
-	alert(str);
+function show_alert(str,type){
+	clearTimeout(alertCloseTimeoutHandle);
+	let allowedTypes=["success","error","info"];
+	if(allowedTypes.indexOf(type)==-1)
+		return false;
+
+	$("#app_notifs").find(".content").html(str);
+	$("#app_notifs").addClass(["visible", type]);
+	alertCloseTimeoutHandle=setTimeout(function(){
+		$("#app_notifs").find(".close").trigger("click");
+	},5000);
 }
 
 function show_modal(str,type,title){
