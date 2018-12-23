@@ -30,7 +30,7 @@
 		"run_at": "document_end"
 	}],
 	"background": {
-		"scripts": ["js/environment.js","js/pubnub.js","js/background.js"],
+		"scripts": ["js/environment.js","js/helpers.js","js/pubnub.js","js/background.js"],
 		"persistent": true
 	},
 	"browser_action":{}

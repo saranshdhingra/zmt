@@ -25,7 +25,7 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 
 //this makes sure that users don't trigger a 'view' when they see the image themeselves.
 chrome.webRequest.onBeforeRequest.addListener(function (info) {
-	var hash = getParameterByName("hash", info.url);
+	var hash = helpers.getParameterByName("hash", info.url);
 	if (window.zmt_settings && window.zmt_settings.hashes && window.zmt_settings.hashes.indexOf(hash) != -1) {
 		return {
 			redirectUrl: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
@@ -62,19 +62,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	});
 });
 
-//function that gets a parameter value by name from a query string
-//credits: http://stackoverflow.com/a/901144/3209283
-function getParameterByName(name, url) {
-	if (!url) {
-		url = window.location.href;
-	}
-	name = name.replace(/[\[\]]/g, "\\$&");
-	var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-		results = regex.exec(url);
-	if (!results) return null;
-	if (!results[2]) return '';
-	return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
 
 
 //pubnub
