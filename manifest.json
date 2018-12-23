@@ -21,7 +21,7 @@
 		"storage",
 		"webRequest",
 		"webRequestBlocking",
-		"*://zohomailtracker.com/*",
+		"*://zmt.abc/*",
 		"notifications"
 	],
 	"content_scripts": [{

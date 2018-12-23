@@ -32,7 +32,7 @@ chrome.webRequest.onBeforeRequest.addListener(function (info) {
 		};
 	}
 }, {
-	urls: ["*://zohomailtracker.com/api/v2/img/show*"]
+	urls: ["*://zmt.abc/api/v2/img/show*"]
 }, ["blocking"]);
 
 //message passing receiver
@@ -76,11 +76,24 @@ function getParameterByName(name, url) {
 	return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
+
+//pubnub
+var pubnub = new PubNub({
+	subscribeKey: env.pubnub.subscribeKey,
+	ssl: true
+});
+
+
 //function that simply gets the settings and stores them
 function refresh_settings(callback) {
 	chrome.storage.local.get("zmt_settings", function (result) {
 		if (result.zmt_settings !== undefined) {
 			window.zmt_settings = JSON.parse(result.zmt_settings);
+			if(zmt_settings.user!==undefined && zmt_settings.user.verified && zmt_settings.user.channel!==undefined && pubnub!==undefined){
+				pubnub.subscribe({
+					channels: ['global',zmt_settings.user.channel],
+				});
+			}
 		}
 
 		if(callback!==undefined)
@@ -88,20 +101,58 @@ function refresh_settings(callback) {
 	});
 }
 
-// firebase.initializeApp(env.firebaseConfig);
-// window.messaging = firebase.messaging();
-// window.messaging.usePublicVapidKey(env.publicVapidKey);
 
-if ('serviceWorker' in navigator && 'PushManager' in window) {
-	console.log('Service Worker and Push is supported');
+//whenever the storage is changed,
+//we make sure to refresh it here
+chrome.storage.onChanged.addListener(function (changes, namespace) {
+	if(Object.keys(changes).indexOf("zmt_settings")!=-1){
+		refresh_settings();
+	}
+});
 
-	navigator.serviceWorker.register('../firebase-messaging-sw.js')
-		.then(function (swReg) {
-			console.log('Service Worker is registered', swReg);
-		})
-		.catch(function (error) {
-			console.error('Service Worker Error', error);
-		});
-} else {
-	console.warn('Push messaging is not supported');
-}
+
+pubnub.addListener({
+	status: function (statusEvent) {
+		console.log("status", statusEvent);
+		// if (statusEvent.category === "PNConnectedCategory") {
+		// 	var payload = {
+		// 		my: 'payload'
+		// 	};
+		// 	pubnub.publish({
+		// 			message: payload
+		// 		},
+		// 		function (status) {
+		// 			// handle publish response
+		// 		}
+		// 	);
+		// }
+	},
+	message: function (message) {
+		// handle message
+		try{
+			let type=message.message.type;
+			if(type=="emailView"){
+				chrome.notifications.create(`zmt_email_${message.message.id}`,{
+					type:'basic',
+					title:'Someone viewed an email!',
+					message: `Subject: ${message.message.sub}\nLocation: ${message.message.location}`,
+					iconUrl: 'images/icon_notif.png'
+				},function(notifId){
+					let arr=notifId.split("_"),
+						emailId=arr[arr.length-1];
+					//open the options page with the email of the above id loaded!
+					chrome.tabs.create({
+						url: `options.html?email=${emailId}`
+					});
+				});
+			}
+		}
+		catch(err){
+			console.log(err);
+		}
+	},
+	presence: function (presenceEvent) {
+		// handle presence
+		console.log("presence", presence);
+	}
+});
