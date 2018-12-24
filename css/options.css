@@ -42,6 +42,7 @@ footer{
 	width:100%;
 	text-align:center;
 	background:#f1f1f1;
+	border-top:1px solid #1a1f25;
 }
 
 .logo{
@@ -55,6 +56,9 @@ footer{
 }
 .menu a:hover,.menu a.active{
 	color:#9068be;
+}
+#tab_contents{
+	padding-bottom:40px;
 }
 #tab_contents .tab_content{
 	display:none;
@@ -212,6 +216,40 @@ input[type="number"] {
 	cursor: pointer;
 	font-size: 14px;
 }
+.btn{
+	background: #449d44;
+	border: 1px solid #419641;
+	color: #fff;
+	text-decoration: none;
+	padding: 5px 10px;
+	border-radius: 5px;
+}
+.close_btn{
+	width: 10px;
+	min-height: 10px;
+	position: relative;
+	display: block;
+}
+.close_btn:before,
+.close_btn:after{
+	content: '';
+	display: block;
+	width: 10px;
+	height: 2px;
+	border-radius: 2px;
+	background: #ccc;
+	position: absolute;
+	left: 0;
+	top: 50%;
+	transform: rotate(45deg);
+}
+.close_btn:after{
+	transform: rotate(-45deg);
+}
+.close_btn:hover:before,
+.close_btn:hover:after{
+	background:#000;
+}
 
 /* Rounded sliders */
 .slider.round {
@@ -257,6 +295,17 @@ button.hidden{
 /*History*/
 #history_div{
 	overflow:auto;
+}
+#history_div .loader{
+	display:none;
+	text-align: center;
+	padding: 50px 0;
+}
+#history_div.loading #history_table{
+	display:none;
+}
+#history_div.loading .loader{
+	display: block;
 }
 table{
 	border-collapse: collapse;
@@ -337,8 +386,12 @@ table .time{
 	text-align: center;
 	font-size: 24px;
 }
+.footer_menu{
+	font-size:12px;
+}
 .footer_menu a{
-	color:#9068be;
+	color: #63aef1;
+	text-decoration: none;
 }
 .announcement{
 	padding: 10px 20px;
@@ -357,4 +410,56 @@ table .time{
 	color:#8a6d3b;
 	border:1px solid #faebcc;
 	background:#fcf8e3;
+}
+#loader{
+	position:fixed;
+	left:0;
+	top:0;
+	width:100%;
+	height:100%;
+	background:rgba(0,0,0,0.8);
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	justify-content:center;
+	opacity:0;
+	pointer-events:none;
+}
+#loader .msg{
+	margin-top:10px;
+	color:#fff;
+}
+#loader.visible{
+	opacity:1;
+	pointer-events:all;
+}
+.loader_spinner{
+	display:inline-block;
+	width:65px;
+	height:65px;
+	background:url('../images/logo64.png') no-repeat;
+	transform-style: preserve-3d;
+	perspective: 100px;
+}
+
+.loader_spinner.visible{
+	animation:rotate3d 2s infinite;
+}
+
+@-webkit-keyframes rotate3d{
+	from{
+		transform:rotateY(0deg);
+	}
+	to{
+		transform:rotateY(1080deg);
+	}
+}
+@keyframes rotate3d {
+	from {
+		transform: rotateY(0deg);
+	}
+
+	to {
+		transform: rotateY(1080deg);
+	}
 }

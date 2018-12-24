@@ -21,7 +21,7 @@
 		<div id="tab_contents">
 			<div class="tab_content active">
 				<div class="announcement announcement-info">
-					<span class="dismiss">X</span>
+					<span class="dismiss"><i class="close_btn"></i></span>
 					<strong>Note: </strong>Unfortunately the emails sent from <strong>14th - 16th December</strong> can't tell the people on the email. This is because Zoho changed some elements on their page and it takes time to fix everything and deploy the latest.<br>
 					<u>Everything will work normally in the emails sent from now!</u>
 				</div>
@@ -88,6 +88,10 @@
 
 						</tbody>
 					</table>
+					<div class="loader">
+						<div class="loader_spinner visible"></div>
+						<div class="msg">Loading History of tracked emails!</div>
+					</div>
 				</div>
 			</div>
 			<div class="tab_content">
@@ -175,13 +179,17 @@
 		<div id="modal">
 			<div id="modal_outer" class="modal_close"></div>
 			<div id="modal_inner">
-				<div class="modal_close">X</div>
+				<div class="modal_close"><i class="close_btn"></i></div>
 				<div id="modal_content"></div>
 			</div>
 		</div>
 		<div id="app_notifs">
 			<div class="content"></div>
-			<div class="close">X</div>
+			<div class="close"><i class="close_btn"></i></div>
+		</div>
+		<div id="loader">
+			<div class="loader_spinner"></div>
+			<div class="msg"></div>
 		</div>
 	</div>
 	<script src="js/helpers.js"></script>

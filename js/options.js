@@ -7,12 +7,14 @@ var settings = {
 	messaging,
 	base_url = env.baseUrl,
 	timezones = helpers.timezones,
-	alertCloseTimeoutHandle;
+	alertCloseTimeoutHandle,
+	loaderPromise;
 jQuery(document).ready(function($){
 
 	//if we have arrived from clicking on the notification
 	let emailHash = helpers.getParameterByName("email",window.location.href);
-	if(emailHash!=null){
+	//only do something when we have come from the notification if the notification was meant for the logged in user!
+	if(emailHash!=null && settings.hashes && settings.hashes.indexOf(emailHash)!=-1){
 		let el=$(`<a href='#' class='show_email_views' data-email='${emailHash}'></a>`);
 		$("body").append(el);
 		setTimeout(function(){
@@ -36,7 +38,7 @@ jQuery(document).ready(function($){
 		options+="<option value='"+t_arr[i]+"'>"+t_arr[i]+"</option>";
 	}
 	$("#timezone_setting").append(options);
-	//initialize the settings
+	//initialize the GUI based on the settings stored in the localhost
 	refresh_settings();
 
 	//logout button
@@ -56,13 +58,26 @@ jQuery(document).ready(function($){
 			return false;
 		}
 		$("#verify_email").attr("disabled",true);
+
+		show_loader("Sending a request to verify the email!");
 		
 		//start the OTP sending process
 		$.post(base_url+"user/login",{email:email},function(response){
-			$("#verify_email").removeAttr("disabled");
-			settings.user={email:email};
-			show_alert(response.msg,"success");
-			update_settings();
+			hide_loader();
+			if(response.code=="0"){
+				show_alert(response.msg,"error");
+			}
+			else{
+				try{
+					$("#verify_email").removeAttr("disabled");
+					settings.user = { email: email };
+					show_alert(response.msg, "success");
+					update_settings();
+				}
+				catch(err){
+					show_alert("There was an error in verifying the user, please try again!", "error");
+				}
+			}
 		});
 	});
 
@@ -93,53 +108,75 @@ jQuery(document).ready(function($){
 	$("#verify_otp").on("click",function(){
 		var otp=$("#otp").val();
 
+		show_loader("Checking the OTP!");
 		//OTP verification
 		$.post(base_url + "user/verify", {
 			email: settings.user.email,
 			otp: otp
 		}, function (response) {
-			console.log(response);
+			hide_loader();
 			if(response.code=="0"){
 				show_alert(response.msg, "error");
+				return;
 			}
 			else if(!response.user || !response.user.api_token){
 				show_alert("Could not verify this user!","error");
+				return;
 			}
-				settings.user.api_token=response.user.api_token;
-				settings.user.verified=true;
-				settings.user.channel = response.user.channel;
-				settings.mail_tracking=true;
-				settings.show_notifications=true;
-			if(response.user.timezone)
-				settings.timezone=response.user.timezone;
-			if(response.user.hashes)
-				settings.hashes=response.user.hashes;
+			else if(response.code=="1"){
+				try{
+					settings.user.api_token = response.user.api_token;
+					settings.user.verified = true;
+					settings.user.channel = response.user.channel;
+					settings.mail_tracking = true;
+					settings.show_notifications = true;
+					if (response.user.timezone)
+						settings.timezone = response.user.timezone;
+					if (response.user.hashes)
+						settings.hashes = response.user.hashes;
 
-			show_alert("User verified!", "success");
-			update_settings();
+					show_alert("User verified!", "success");
+					update_settings();
+				}
+				catch(err){
+					show_alert("There was an error in verifying the user, please try again!","error");
+				}
+			}
+			else{
+				show_alert("Request could not be completed!");
+			}
 		});
 	});
 
-	$("#chk_show_notifs").on("change",function(){
-		//when someone switches on their show_notifications button,
-		//we simply get the channel if its not already there
-		if($(this).prop("checked")=="1" && settings.user && !settings.user.channel){
-			$.post(base_url+"user/channel",{
-				api_token:settings.user.api_token
-			},function(response){
-				if(response.code=="1"){
-					settings.user.channel=response.channel;
-				}
-			});
-		}
-	});
-
+	//save the settings based on what is selected in the GUI
 	$("#save_settings").on("click",function(){
+		show_loader("Saving Settings!");
 		//show notifications?
-		if ($("#chk_show_notifs").prop("checked"))
-			settings.show_notifications = true;
-		else
-			settings.show_notifications = false;
+		let p1=new Promise(function(resolve,reject){
+			if ($("#chk_show_notifs").prop("checked")) {
+				$.post(base_url + "user/channel", {
+					api_token: settings.user.api_token
+				}, function (response) {
+					try{
+						if (response.code == "1") {
+							settings.user.channel = response.channel;
+							settings.show_notifications = true;
+						}
+						else{
+							settings.show_notifications = false;
+						}
+					}
+					catch(err){
+						resolve();
+					}
+					resolve();
+				});
+			}
+			else{
+				settings.show_notifications = false;
+				resolve();			
+			}
+		});
 
 		//tracking	
 		if ($("#chk_tracking_status").prop("checked"))
@@ -147,16 +184,25 @@ jQuery(document).ready(function($){
 		else
 			settings.mail_tracking = false;
 
-		$.post(base_url + "user/update_timezone", {
+		let p2=$.post(base_url + "user/update_timezone", {
 			timezone : $("#timezone_setting").val(),
 			api_token: settings.user.api_token
 		}, function (response) {
-			console.log(response);
-			settings.timezone = $("#timezone_setting").val();
-			update_settings(true,function(){
+			if(response.code=="1")
+				settings.timezone = $("#timezone_setting").val();
+		});
+
+		Promise.all([p1,p2]).then(function(){
+			update_settings(true, function () {
+				hide_loader();
 				show_alert("Settings saved!", "success");
 			});
+		}).catch(function(){
+			hide_loader();
+			show_alert("There was an error!", "error");
+			refresh_settings();
 		});
+
 	});
 
 	//Tabs
@@ -213,6 +259,7 @@ jQuery(document).ready(function($){
 	});
 });
 
+//updates the local storage with the current settings object
 function update_settings(do_refresh,cb){
 
 	//if the user wants to show notifications, but doesn't have any channel stored
@@ -231,6 +278,7 @@ function update_settings(do_refresh,cb){
 	});
 }
 
+//refresh the GUI based on the settings stored in localstorage
 function refresh_settings(){
 	chrome.storage.local.get("zmt_settings", function (result) {
 		// console.log(result);
@@ -280,17 +328,18 @@ function refresh_settings(){
 		}
 
 		var selected_tz=settings.timezone===undefined?"GMT":settings.timezone
-		$("#timezone_setting").find("option[value='" + selected_tz + "']").attr("selected",true);
+		$("#timezone_setting").find("option").removeAttr("selected").siblings("option[value='" + selected_tz + "']").attr("selected",true);
 
 		load_history();
 
 		$("body").on("click", ".show_email_views",function(e){
-			console.log("clicked");
 			e.preventDefault();
 			var hash=$(this).attr("data-email");
+			show_loader("Loading details of the email!");
 			$.post(base_url + `emails/${hash}/details`, {
 				api_token: settings.user.api_token
 			}, function (response) {
+				hide_loader();
 				let html=`
 					<div class='email_subject'><strong>Email: </strong> ${response.subject}</div>
 					<table class="email_views">
@@ -337,15 +386,19 @@ function refresh_settings(){
 	});
 }
 
+//function to get the history of emails
 function load_history(){
 	if(!settings.user || !settings.user.verified || !settings.user.api_token){
-		$("#history_div").html("<tr><td colspan=7>You need to log in before seeing the history!</td></tr>");
+		$("#history_table").find("tbody").html("<tr><td colspan=7 style='text-align:center;'>You need to log in before seeing the history!</td></tr>");
 		return;
 	}
+
+	$("#history_div").addClass("loading");
 
 	$.post(base_url + "user/history", {
 		api_token:settings.user.api_token
 	}, function (response) {
+		$("#history_div").removeClass("loading");
 		if(!response.history || response.history.length==0){
 			$("#history_table").find("tbody").html("<tr><td colspan=7>No emails being tracked!</td></tr>");
 			return;
@@ -356,7 +409,7 @@ function load_history(){
 			let row=response.history[i];
 			html+=`<tr>
 						<td>${(i+1)}</td>
-						<td><a href='#' data-email='${row.hash}' class='show_email_views'>Details</a></td>
+						<td><a href='#' data-email='${row.hash}' class='show_email_views btn'>Details</a></td>
 						<td>${row.subject}</td>
 						<td>${row.views_count}</td>
 						<td>${row.to_field}</td>
@@ -369,6 +422,7 @@ function load_history(){
 	});
 }
 
+//In-GUI notifications/alerts
 function show_alert(str,type){
 	clearTimeout(alertCloseTimeoutHandle);
 	let allowedTypes=["success","error","info"];
@@ -385,4 +439,26 @@ function show_alert(str,type){
 function show_modal(str,type,title){
 	$("#modal_content").html(str);
 	$("#modal").addClass("visible");
+}
+
+//simply shows the spinning
+function show_loader(str){
+	$("#loader").find(".msg").text(str);
+	$("#loader").addClass("visible").find(".loader_spinner").addClass("visible");
+	loaderPromise=new Promise(function(resolve,reject){
+		setTimeout(function(){
+			resolve();
+		},1000);
+	});
+}
+
+//hides the spinning loader
+function hide_loader(){
+	//this will make sure that even if the hide_loader is called immediately after
+	//show_loader we still show the loader for at least the duration of the timeout
+	//used inside the show_loader method
+	loaderPromise.then(function(){
+		$("#loader").find(".msg").text("");
+		$("#loader").removeClass("visible").find(".loader_spinner").removeClass("visible");
+	});
 }
