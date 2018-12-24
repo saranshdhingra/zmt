@@ -1,3 +1,4 @@
+var prevSubscribedChannel="";
 //when extension is loaded
 chrome.runtime.onInstalled.addListener(function () {
 	refresh_settings();
@@ -76,10 +77,21 @@ function refresh_settings(callback) {
 	chrome.storage.local.get("zmt_settings", function (result) {
 		if (result.zmt_settings !== undefined) {
 			window.zmt_settings = JSON.parse(result.zmt_settings);
-			if(zmt_settings.user!==undefined && zmt_settings.user.verified && zmt_settings.user.channel!==undefined && pubnub!==undefined){
+
+
+			//unsubscribe from the prev pubnub channel, just to stay updated
+			//i.e if anything changes like the user logs out, or someone else logs in!
+			pubnub.unsubscribe({
+				channels:[prevSubscribedChannel]
+			});
+
+			if(zmt_settings.user!==undefined && zmt_settings.user.verified && zmt_settings.user.channel!==undefined && pubnub!==undefined && zmt_settings.show_notifications){
 				pubnub.subscribe({
 					channels: ['global',zmt_settings.user.channel],
 				});
+
+				//update the channel that was subscribed last
+				prevSubscribedChannel=zmt_settings.user.channel;
 			}
 		}
 
@@ -115,6 +127,9 @@ pubnub.addListener({
 		// }
 	},
 	message: function (message) {
+		// if(!zmt_settings.show_notifications){
+		// 	return;
+		// }
 		// handle message
 		try{
 			let type=message.message.type;
