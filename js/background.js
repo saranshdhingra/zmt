@@ -126,12 +126,20 @@ pubnub.addListener({
 					iconUrl: 'images/icon_notif.png'
 				});
 			}
+			else if(type=="contact"){
+				chrome.notifications.create(`zmt_contact_${(new Date()).getMilliseconds()}`, {
+					type: 'basic',
+					title: 'Someone sent a contact entry!',
+					message: `Type:${message.message.contactType}\nEmail:${message.message.email}`,
+					iconUrl: 'images/icon_notif.png'
+				});
+			}
 		}
 		catch(err){
 			console.log(err);
 		}
 	},
-	presence: function (presenceEvent) {
+	presence: function (presenceEvent){
 		// handle presence
 		console.log("presence", presence);
 	}
@@ -139,9 +147,12 @@ pubnub.addListener({
 
 chrome.notifications.onClicked.addListener(function(notifId){
 	let arr = notifId.split("_"),
-		emailId = arr[arr.length - 1];
+		type = arr[2],
+		emailId = arr[2]=="email"?arr[arr.length - 1]:false;
+
 	//open the options page with the email of the above id loaded!
-	chrome.tabs.create({
-		url: `options.html?email=${emailId}`
-	});
+	if(emailId)
+		chrome.tabs.create({
+			url: `options.html?email=${emailId}`
+		});
 })

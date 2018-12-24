@@ -79,8 +79,12 @@ footer{
 	opacity:0;
 	pointer-events:none;
 }
+.input.submit_input{
+	margin-top:40px;
+}
 .input label>span{
 	display:inline-block;
+	vertical-align:top;
 	min-width:150px;
 }
 /* The switch - the box around the slider */
@@ -131,10 +135,12 @@ input:checked+.slider:before {
 }
 input[type="text"],
 input[type="email"],
-select {
+select,
+textarea{
 	padding: 10px;
 	font-size: 12px;
 	border: 1px solid #ccc;
+	min-width:200px;
 	max-width:200px;
 }
 input[type="text"]:focus,
@@ -144,7 +150,9 @@ input[type="email"]:active,
 input[type="number"]:focus,
 input[type="number"]:active,
 select:focus,
-select:active {
+select:active,
+textarea:focus,
+textarea:active{
 	outline: none;
 }
 input[type="number"] {

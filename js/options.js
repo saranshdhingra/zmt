@@ -311,6 +311,23 @@ jQuery(document).ready(function($){
 			show_modal(html, 'success', 'Success!');
 		});
 	});
+
+	//contact section
+	$("#contact_form").on("submit",function(e){
+		e.preventDefault();
+		let data = $(this).serialize();
+		show_loader("Sending your query!");
+		$.post(base_url+"contact",data,function(response){
+			hide_loader();
+			console.log(response);
+			if(response.code=="0"){
+				show_alert(response.msg,"error");
+			}
+			else if(response.code=="1"){
+				show_alert(response.msg, "success");
+			}
+		})
+	});
 });
 
 //updates the local storage with the current settings object
