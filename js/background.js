@@ -113,23 +113,8 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 pubnub.addListener({
 	status: function (statusEvent) {
 		console.log("status", statusEvent);
-		// if (statusEvent.category === "PNConnectedCategory") {
-		// 	var payload = {
-		// 		my: 'payload'
-		// 	};
-		// 	pubnub.publish({
-		// 			message: payload
-		// 		},
-		// 		function (status) {
-		// 			// handle publish response
-		// 		}
-		// 	);
-		// }
 	},
 	message: function (message) {
-		// if(!zmt_settings.show_notifications){
-		// 	return;
-		// }
 		// handle message
 		try{
 			let type=message.message.type;
@@ -139,13 +124,6 @@ pubnub.addListener({
 					title:'Someone viewed an email!',
 					message: `Subject: ${message.message.sub}\nLocation: ${message.message.location}`,
 					iconUrl: 'images/icon_notif.png'
-				},function(notifId){
-					let arr=notifId.split("_"),
-						emailId=arr[arr.length-1];
-					//open the options page with the email of the above id loaded!
-					chrome.tabs.create({
-						url: `options.html?email=${emailId}`
-					});
 				});
 			}
 		}
@@ -158,3 +136,12 @@ pubnub.addListener({
 		console.log("presence", presence);
 	}
 });
+
+chrome.notifications.onClicked.addListener(function(notifId){
+	let arr = notifId.split("_"),
+		emailId = arr[arr.length - 1];
+	//open the options page with the email of the above id loaded!
+	chrome.tabs.create({
+		url: `options.html?email=${emailId}`
+	});
+})

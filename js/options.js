@@ -11,18 +11,6 @@ var settings = {
 	loaderPromise;
 jQuery(document).ready(function($){
 
-	//if we have arrived from clicking on the notification
-	let emailHash = helpers.getParameterByName("email",window.location.href);
-	//only do something when we have come from the notification if the notification was meant for the logged in user!
-	if(emailHash!=null && settings.hashes && settings.hashes.indexOf(emailHash)!=-1){
-		let el=$(`<a href='#' class='show_email_views' data-email='${emailHash}'></a>`);
-		$("body").append(el);
-		setTimeout(function(){
-			el.trigger("click");
-			el.remove();
-		},0);
-	}
-
 	//last seen version reset(for the NEW badge)
 	chrome.storage.local.set({
 		'last_seen_version': chrome.app.getDetails().version
@@ -39,7 +27,19 @@ jQuery(document).ready(function($){
 	}
 	$("#timezone_setting").append(options);
 	//initialize the GUI based on the settings stored in the localhost
-	refresh_settings();
+	refresh_settings(function(){
+		//if we have arrived from clicking on the notification
+		let emailHash = helpers.getParameterByName("email", window.location.href);
+		//only do something when we have come from the notification if the notification was meant for the logged in user!
+		if (emailHash != null && settings.hashes && settings.hashes.indexOf(emailHash) != -1) {
+			let el = $(`<a href='#' class='show_email_views' data-email='${emailHash}'></a>`);
+			$("body").append(el);
+			setTimeout(function () {
+				el.trigger("click");
+				el.remove();
+			}, 0);
+		}
+	});
 
 	//logout button
 	$(".logout").on("click",function(e){
@@ -257,6 +257,59 @@ jQuery(document).ready(function($){
 	$("body").on("click",".accordion h4",function(){
 		$(this).siblings("p").slideToggle();
 	});
+
+	//'Details' button in the history
+	$("body").on("click", ".show_email_views", function (e) {
+		e.preventDefault();
+		var hash = $(this).attr("data-email");
+		show_loader("Loading details of the email!");
+		$.post(base_url + `emails/${hash}/details`, {
+			api_token: settings.user.api_token
+		}, function (response) {
+			hide_loader();
+			if(response.code=="0"){
+				show_alert(response.msg,"error");
+				return;
+			}
+			let html = `
+					<div class='email_subject'><strong>Email: </strong> ${response.subject}</div>
+					<table class="email_views">
+						<thead>
+							<tr>
+								<td>S.No.</td>
+								<td>IP</td>
+								<td>Device</td>
+								<td>Location</td>
+								<td>User Agent</td>
+								<td>Time</td>
+							</tr>
+						</thead>
+						<tbody>
+				`;
+			if (response.details.length == 0)
+				html += "<tr><td colspan=6 style='text-align:center;'>This email hasn't been viewed yet!</td></tr>";
+			else {
+				for (let i = 0; i < response.details.length; i++) {
+					let row = response.details[i];
+					html += `
+							<tr class="email_view">
+								<td>${(i+1)}</td>
+								<td>${row.user_ip}</td>
+								<td>${row.device}</td>
+								<td>${row.location}</td>
+								<td>${row.user_agent}</td>
+								<td><div class="time">${row.viewed_at}</div></td>
+							</tr>
+						`;
+				}
+			}
+			html += `</tbody></table>`;
+			show_modal(html, 'success', 'Success!');
+		});
+	});
+
+	//fetch the history
+	load_history();
 });
 
 //updates the local storage with the current settings object
@@ -279,7 +332,7 @@ function update_settings(do_refresh,cb){
 }
 
 //refresh the GUI based on the settings stored in localstorage
-function refresh_settings(){
+function refresh_settings(callback){
 	chrome.storage.local.get("zmt_settings", function (result) {
 		// console.log(result);
 		if(result.zmt_settings!==undefined){
@@ -330,52 +383,8 @@ function refresh_settings(){
 		var selected_tz=settings.timezone===undefined?"GMT":settings.timezone
 		$("#timezone_setting").find("option").removeAttr("selected").siblings("option[value='" + selected_tz + "']").attr("selected",true);
 
-		load_history();
-
-		$("body").on("click", ".show_email_views",function(e){
-			e.preventDefault();
-			var hash=$(this).attr("data-email");
-			show_loader("Loading details of the email!");
-			$.post(base_url + `emails/${hash}/details`, {
-				api_token: settings.user.api_token
-			}, function (response) {
-				hide_loader();
-				let html=`
-					<div class='email_subject'><strong>Email: </strong> ${response.subject}</div>
-					<table class="email_views">
-						<thead>
-							<tr>
-								<td>S.No.</td>
-								<td>IP</td>
-								<td>Device</td>
-								<td>Location</td>
-								<td>User Agent</td>
-								<td>Time</td>
-							</tr>
-						</thead>
-						<tbody>
-				`;
-				if(response.details.length==0)
-					html+="<tr><td colspan=6 style='text-align:center;'>This email hasn't been viewed yet!</td></tr>";
-				else{
-					for(let i=0;i<response.details.length;i++){
-						let row=response.details[i];
-						html+=`
-							<tr class="email_view">
-								<td>${(i+1)}</td>
-								<td>${row.user_ip}</td>
-								<td>${row.device}</td>
-								<td>${row.location}</td>
-								<td>${row.user_agent}</td>
-								<td><div class="time">${row.viewed_at}</div></td>
-							</tr>
-						`;
-					}
-				}
-				html+=`</tbody></table>`;
-				show_modal(html,'success','Success!');
-			});
-		});
+		if(callback!==undefined)
+			callback();
 	});
 
 	//
