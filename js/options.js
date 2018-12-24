@@ -26,6 +26,7 @@ jQuery(document).ready(function($){
 		options+="<option value='"+t_arr[i]+"'>"+t_arr[i]+"</option>";
 	}
 	$("#timezone_setting").append(options);
+
 	//initialize the GUI based on the settings stored in the localhost
 	refresh_settings(function(){
 		//if we have arrived from clicking on the notification
@@ -39,6 +40,9 @@ jQuery(document).ready(function($){
 				el.remove();
 			}, 0);
 		}
+
+		//fetch the history
+		load_history();
 	});
 
 	//logout button
@@ -307,9 +311,6 @@ jQuery(document).ready(function($){
 			show_modal(html, 'success', 'Success!');
 		});
 	});
-
-	//fetch the history
-	load_history();
 });
 
 //updates the local storage with the current settings object
