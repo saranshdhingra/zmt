@@ -33,7 +33,7 @@ chrome.webRequest.onBeforeRequest.addListener(function (info) {
 		};
 	}
 }, {
-	urls: ["*://zmt.abc/api/v2/img/show*"]
+	urls: ["*://zohomailtracker.com/api/v2/img/show*"]
 }, ["blocking"]);
 
 //message passing receiver
