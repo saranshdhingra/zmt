@@ -11,7 +11,6 @@ jQuery(document).ready(function($){
 	if (!zoho_patt.test(window.location.host)) {
 		return;
 	}
-	// console.log("injected");
 
 	refresh_settings(function(){
 		// check_doc_email();
@@ -45,11 +44,9 @@ jQuery(document).ready(function($){
 
 	$("body").on("mouseup", ".zmcDrpDwnMnu.SC_Phr > li", function (e) {
 		e.preventDefault();
-		console.log("clicked");
 		setTimeout(function(){
 			$("[data-event='s'],[data-zmt_event='s']").each(function () {
 				var btn = $(this);
-				console.log("iteration", btn);
 				replace_send_btn(btn);
 			});
 		},500);
@@ -63,15 +60,32 @@ jQuery(document).ready(function($){
 
 });
 
-
-function refresh_settings(){
+//the function that gets the settings from localstorage and then stores a local copy of it!
+function refresh_settings(callback){
 	chrome.storage.local.get("zmt_settings", function (result) {
 		if (result.zmt_settings !== undefined) {
-			// console.log(result.zmt_settings);
 			window.zmt_settings = JSON.parse(result.zmt_settings);
+			if(callback!==undefined){
+				callback();
+			}
 		}
 	});
 }
+
+//whenever the storage is changed,
+//we make sure to refresh it here
+chrome.storage.onChanged.addListener(function (changes, namespace) {
+	if (Object.keys(changes).indexOf("zmt_settings") != -1) {
+		refresh_settings(function(){
+			//this makes sure if someone changes a setting, like user, mail tracking etc
+			//it is reflected in the emails that are opened w/o a need for reload
+			$("[data-event='s'],[data-zmt_event='s']").each(function () {
+				var btn = $(this);
+				replace_send_btn(btn);
+			});
+		});
+	}
+});
 
 //function that checks that the send button exists in the DOM.
 //if recurse is true and there is not send btn(near the el) , it will keep calling itself recursively.
@@ -96,7 +110,6 @@ function replace_send_btn(el){
 		parent = send_btn.parents(".SC_flt"),
 		sender = getEmailSender(send_btn),
 		tracking_str;
-	console.log(sender,zmt_settings.user.email);
 	if (zmt_settings && zmt_settings.mail_tracking && zmt_settings.user && zmt_settings.user.verified &&  !window.needs_reload && sender==zmt_settings.user.email) {
 		tracking_str=`<ul class='zmt_tracking_status'><li><img src='${chrome.extension.getURL('images/tracker_inserted.png')}' data-tooltip="Tracker will be inserted on 'Send'"></li></ul>`;
 		
