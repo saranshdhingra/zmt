@@ -74,6 +74,12 @@ footer{
 	pointer-events:all;
 	transition:all .4s;
 }
+.input input[readonly],
+.input select[readonly],
+.input textarea[readonly]{
+	pointer-events:none;
+	background:rgb(235, 235, 228);
+}
 .input.hidden{
 	height:0;
 	opacity:0;
@@ -84,7 +90,7 @@ footer{
 }
 .input label>span{
 	display:inline-block;
-	vertical-align:top;
+	vertical-align:middle;
 	min-width:150px;
 }
 /* The switch - the box around the slider */

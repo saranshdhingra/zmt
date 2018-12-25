@@ -401,6 +401,14 @@ function refresh_settings(callback){
 		var selected_tz=settings.timezone===undefined?"GMT":settings.timezone
 		$("#timezone_setting").find("option").removeAttr("selected").siblings("option[value='" + selected_tz + "']").attr("selected",true);
 
+		//bind the user email to the contact form if the user has logged in!
+		if (settings.user && settings.user.verified && settings.user.email) {
+			$("#contact_email").val(settings.user.email).attr("readonly", true);
+		}
+		else{
+			$("#contact_email").val("").removeAttr("readonly");
+		}
+
 		if(callback!==undefined)
 			callback();
 	});
