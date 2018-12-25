@@ -319,7 +319,6 @@ jQuery(document).ready(function($){
 		show_loader("Sending your query!");
 		$.post(base_url+"contact",data,function(response){
 			hide_loader();
-			console.log(response);
 			if(response.code=="0"){
 				show_alert(response.msg,"error");
 			}
@@ -358,9 +357,7 @@ function update_settings(do_refresh,cb){
 //refresh the GUI based on the settings stored in localstorage
 function refresh_settings(callback){
 	chrome.storage.local.get("zmt_settings", function (result) {
-		// console.log(result);
 		if(result.zmt_settings!==undefined){
-			console.log(result.zmt_settings);
 			window.settings = JSON.parse(result.zmt_settings);
 		}
 
@@ -484,8 +481,8 @@ function show_modal(str,type,title){
 
 //simply shows the spinning
 function show_loader(str){
-	$("#loader").find(".msg").text(str);
-	$("#loader").addClass("visible").find(".loader_spinner").addClass("visible");
+	$("#zmt_loader").find(".msg").text(str);
+	$("#zmt_loader").addClass("visible").find(".loader_spinner").addClass("visible");
 	loaderPromise=new Promise(function(resolve,reject){
 		setTimeout(function(){
 			resolve();
@@ -499,7 +496,7 @@ function hide_loader(){
 	//show_loader we still show the loader for at least the duration of the timeout
 	//used inside the show_loader method
 	loaderPromise.then(function(){
-		$("#loader").find(".msg").text("");
-		$("#loader").removeClass("visible").find(".loader_spinner").removeClass("visible");
+		$("#zmt_loader").find(".msg").text("");
+		$("#zmt_loader").removeClass("visible").find(".loader_spinner").removeClass("visible");
 	});
 }

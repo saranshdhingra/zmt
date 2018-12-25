@@ -112,7 +112,6 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 
 pubnub.addListener({
 	status: function (statusEvent) {
-		console.log("status", statusEvent);
 	},
 	message: function (message) {
 		// handle message
@@ -134,14 +133,20 @@ pubnub.addListener({
 					iconUrl: 'images/icon_notif.png'
 				});
 			}
+			else if(type=="global"){
+				chrome.notifications.create(`zmt_global_${(new Date()).getMilliseconds()}`, {
+					type: 'basic',
+					title: message.message.title,
+					message: message.message.body,
+					iconUrl: 'images/icon_notif.png'
+				});
+			}
 		}
 		catch(err){
-			console.log(err);
 		}
 	},
 	presence: function (presenceEvent){
 		// handle presence
-		console.log("presence", presence);
 	}
 });
 

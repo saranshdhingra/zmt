@@ -3,6 +3,7 @@ var zmt_token,
 	needs_reload=false,
 	base_url = "http://zmt.abc/api/v2/",
 	zmt_settings,
+	zmtLoaderPromise,
 	zoho_patt = new RegExp("^mail\.zoho\.[a-z]+$");
 
 jQuery(document).ready(function($){
@@ -11,6 +12,10 @@ jQuery(document).ready(function($){
 	if (!zoho_patt.test(window.location.host)) {
 		return;
 	}
+
+	//add the zmt loader and alert HTML
+	$("body").append(`<div id='zmt_loader'><div class='loader_spinner' style='background:url(${chrome.extension.getURL('images/logo64.png')});'></div><div class='msg'></div></div>`);
+	$("body").append("<div id='zmt_app_alert'><div class='content'></div><div class='close'><i class='zmt_close_btn'></i></div></div>");
 
 	refresh_settings(function(){
 		// check_doc_email();
@@ -42,6 +47,7 @@ jQuery(document).ready(function($){
 		}
 	});
 
+	//update the sender and the UI helpers on changing the alias
 	$("body").on("mouseup", ".zmcDrpDwnMnu.SC_Phr > li", function (e) {
 		e.preventDefault();
 		setTimeout(function(){
@@ -50,6 +56,10 @@ jQuery(document).ready(function($){
 				replace_send_btn(btn);
 			});
 		},500);
+	});
+
+	$("body").find("#zmt_app_alert .close").on("click", function () {
+		$("#zmt_app_alert").removeClass(["visible", "success", "error", "info"]);
 	});
 
 	//we call this repetitively so that hypothetically, if a person is writing a mail and the extension updates, it won't be able to insert a tracker.
@@ -152,25 +162,41 @@ function replace_send_btn(el){
 }
 
 function insert_tracker(send_btn){
-	//find the tracking pixel in this mail and the subject of the mail
-	var mail_body = send_btn.parents(".SC_mclst.zmCnew").children(".zmCE").find(".ze_area");
+	zmtShowLoader("Inserting tracker!");
+	try{
+		//find the tracking pixel in this mail and the subject of the mail
+		var mail_body = send_btn.parents(".SC_mclst.zmCnew").children(".zmCE").find(".ze_area");
 
-	remove_current_pixels_from_mail(mail_body);
+		remove_current_pixels_from_mail(mail_body);
 
-	var subject = get_subject_field_val(send_btn),
-		to_field = get_to_field_val(send_btn),
-		cc_field = get_cc_field_val(send_btn),
-		bcc_field = get_bcc_field_val(send_btn);
+		var subject = get_subject_field_val(send_btn),
+			to_field = get_to_field_val(send_btn),
+			cc_field = get_cc_field_val(send_btn),
+			bcc_field = get_bcc_field_val(send_btn);
+		
+		if(to_field.length==0){
+			zmtHideLoader(function(){
+				zmtShowAlert("Please fill up the Recepient!", "error");
+			});
+			return;
+		}
 
-	fetch_hash_from_server(subject, to_field, cc_field, bcc_field, function (hash) {
-		var img_str = "<img src='" + base_url + "img/show?hash=" + hash + "' class='zmt_pixel' />";
+		fetch_hash_from_server(send_btn, subject, to_field, cc_field, bcc_field, function (hash) {
+			var img_str = "<img src='" + base_url + "img/show?hash=" + hash + "' class='zmt_pixel' />";
 
-		//first make sure that the hash is added to the list of hashes to be blocked, then append the image in the ,mail.
-		add_hash_to_local(hash, function () {
-			mail_body.contents().find("body").append(img_str);
+			//first make sure that the hash is added to the list of hashes to be blocked, then append the image in the ,mail.
+			add_hash_to_local(hash, function () {
+				mail_body.contents().find("body").append(img_str);
+				send_mail(send_btn);
+			});
+		});
+	}
+	catch(err){
+		zmtHideLoader(function(){
+			zmtShowAlert("Tracker inserting failed!","error");
 			send_mail(send_btn);
 		});
-	});
+	}
 }
 
 //function that checks if the tracking pixel is present in the mail_body element
@@ -239,17 +265,38 @@ function is_email_valid(email) {
 	return re.test(String(email).toLowerCase());
 }
 
-function fetch_hash_from_server(subject, to_field, cc_field, bcc_field, callback) {
-	$.post(base_url + "img/new", {
-		api_token: zmt_settings.user.api_token,
-		subject: subject,
-		to_field: to_field,
-		cc_field: cc_field,
-		bcc_field: bcc_field
-	}, function (response) {
-		var hash = response.hash;
-		callback(hash);
-	});
+function fetch_hash_from_server(send_btn, subject, to_field, cc_field, bcc_field, callback) {
+	try{
+		$.post(base_url + "img/new", {
+			api_token: zmt_settings.user.api_token,
+			subject: subject,
+			to_field: to_field,
+			cc_field: cc_field,
+			bcc_field: bcc_field
+		}, function (response) {
+			if(response.code=="1"){
+				var hash = response.hash;
+				callback(hash);
+			}
+			else{
+				zmtHideLoader(function () {
+					zmtShowAlert("Tracker inserting failed!", "error");
+					send_mail(send_btn);
+				});
+			}
+		}).fail(function(err){
+			zmtHideLoader(function () {
+				zmtShowAlert("Tracker inserting failed!", "error");
+				send_mail(send_btn);
+			});
+		});
+	}
+	catch(err){
+		zmtHideLoader(function () {
+			zmtShowAlert("Tracker inserting failed!", "error");
+			send_mail(send_btn);
+		});
+	}
 }
 
 //add a hash to the local list of hashes
@@ -298,4 +345,38 @@ function check_page_needs_reload(){
 		window.needs_reload=true;
 	}
 	window.needs_reload=false;
+}
+
+//the function that shows the loader inside UI
+function zmtShowLoader(msg){
+	$("#zmt_loader").find(".msg").text(msg);
+	$("#zmt_loader").addClass("visible").find(".loader_spinner").addClass("visible");
+	zmtLoaderPromise = new Promise(function (resolve, reject) {
+		setTimeout(function () {
+			resolve();
+		}, 1000);
+	});
+}
+
+//hide the loader
+function zmtHideLoader(callback){
+	//this will make sure that even if the hideLoader is called immediately after
+	//show_loader we still show the loader for at least the duration of the timeout
+	//used inside the showLoader method
+	zmtLoaderPromise.then(function () {
+		$("#zmt_loader").find(".msg").text("");
+		$("#zmt_loader").removeClass("visible").find(".loader_spinner").removeClass("visible");
+		if(callback!==undefined){
+			callback();
+		}
+	});
+}
+
+function zmtShowAlert(msg,type){
+	let allowedTypes = ["success", "error", "info"];
+	if (allowedTypes.indexOf(type) == -1)
+		return false;
+
+	$("#zmt_app_alert").find(".content").html(msg);
+	$("#zmt_app_alert").addClass(["visible", type]);
 }
