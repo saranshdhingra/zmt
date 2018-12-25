@@ -40,11 +40,11 @@ chrome.webRequest.onBeforeRequest.addListener(function (info) {
 //this should take care of things like dynamically adding hashes to our whitelist
 //need to refresh zmt_settings here
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-
-	//it is important to refresh the settings before we add the hash to local.
-	refresh_settings(function(){
-		//add_hash is recieved when a new hash is supposed to be added in our whitelist
-		if (request.action == "add_hash") {
+	
+	if (request.action == "add_hash") {
+		//it is important to refresh the settings before we add the hash to local.
+		refresh_settings(function(){
+			//add_hash is recieved when a new hash is supposed to be added in our whitelist
 			let hash = request.hash;
 			hashes = zmt_settings.hashes === undefined ? [] : zmt_settings.hashes;
 			if (hashes.indexOf(hash) == -1)
@@ -55,12 +55,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 			}, function () {
 				sendResponse({});
 			});
-		}
-		// else if (request.action == "settings_changed") {
-		// 	refresh_settings();
-		// 	sendResponse({});
-		// }
-	});
+		});
+	}
 });
 
 
@@ -152,8 +148,8 @@ pubnub.addListener({
 
 chrome.notifications.onClicked.addListener(function(notifId){
 	let arr = notifId.split("_"),
-		type = arr[2],
-		emailId = arr[2]=="email"?arr[arr.length - 1]:false;
+		type = arr[1],
+		emailId = arr[1]=="email"?arr[arr.length - 1]:false;
 
 	//open the options page with the email of the above id loaded!
 	if(emailId)

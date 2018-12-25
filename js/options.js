@@ -129,6 +129,7 @@ jQuery(document).ready(function($){
 			}
 			else if(response.code=="1"){
 				try{
+					$("#otp").val("");	//clear the field on success
 					settings.user.api_token = response.user.api_token;
 					settings.user.verified = true;
 					settings.user.channel = response.user.channel;
@@ -481,8 +482,8 @@ function show_modal(str,type,title){
 
 //simply shows the spinning
 function show_loader(str){
-	$("#zmt_loader").find(".msg").text(str);
-	$("#zmt_loader").addClass("visible").find(".loader_spinner").addClass("visible");
+	$("#loader").find(".msg").text(str);
+	$("#loader").addClass("visible").find(".loader_spinner").addClass("visible");
 	loaderPromise=new Promise(function(resolve,reject){
 		setTimeout(function(){
 			resolve();
@@ -496,7 +497,7 @@ function hide_loader(){
 	//show_loader we still show the loader for at least the duration of the timeout
 	//used inside the show_loader method
 	loaderPromise.then(function(){
-		$("#zmt_loader").find(".msg").text("");
-		$("#zmt_loader").removeClass("visible").find(".loader_spinner").removeClass("visible");
+		$("#loader").find(".msg").text("");
+		$("#loader").removeClass("visible").find(".loader_spinner").removeClass("visible");
 	});
 }

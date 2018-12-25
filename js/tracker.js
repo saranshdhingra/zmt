@@ -186,8 +186,10 @@ function insert_tracker(send_btn){
 
 			//first make sure that the hash is added to the list of hashes to be blocked, then append the image in the ,mail.
 			add_hash_to_local(hash, function () {
-				mail_body.contents().find("body").append(img_str);
-				send_mail(send_btn);
+				zmtHideLoader(function(){
+					mail_body.contents().find("body").append(img_str);
+					send_mail(send_btn);
+				});
 			});
 		});
 	}
