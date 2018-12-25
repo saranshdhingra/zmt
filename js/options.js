@@ -325,6 +325,12 @@ jQuery(document).ready(function($){
 			}
 			else if(response.code=="1"){
 				show_alert(response.msg, "success");
+				if($("#contact_email").attr("readonly")){
+					$("#contact_form").find("input[name]:not([type=email]),textarea").val("");
+				}
+				else{
+					$("#contact_form").find("input[name],textarea").val("");
+				}
 			}
 		})
 	});
