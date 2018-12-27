@@ -231,7 +231,7 @@ jQuery(document).ready(function($){
 
 	//modals
 	$(".modal_close").on("click",function(){
-		$("#modal").removeClass("visible");
+		$("#modal").removeClass(["visible","confirmation"]);
 		setTimeout(function(){
 			$("#modal_content").html("");
 		},600);
@@ -317,6 +317,15 @@ jQuery(document).ready(function($){
 			html += `</tbody></table>`;
 			show_modal(html, 'success', 'Success!');
 		});
+	});
+
+	//'Delete' button in the history
+	$("body").on("click", ".delete_email",function(e){
+		e.preventDefault();
+		let email=$(this).attr("data-email"),
+			subject=$(this).attr("data-subject");
+
+		showDeleteConfirmationDialog(email,subject);
 	});
 
 	//contact section
@@ -461,7 +470,10 @@ function load_history(){
 			let row=response.history[i];
 			html+=`<tr>
 						<td>${(i+1)}</td>
-						<td><a href='#' data-email='${row.hash}' class='show_email_views btn'>Details</a></td>
+						<td>
+							<a href='#' data-email='${row.hash}' class='show_email_views btn'>Details</a>
+							<a href='#' data-email='${row.hash}' data-subject='${row.subject}' class='delete_email'>Delete</a>
+						</td>
 						<td>${row.subject}</td>
 						<td>${row.views_count}</td>
 						<td>${row.to_field}</td>
@@ -513,4 +525,16 @@ function hide_loader(){
 		$("#loader").find(".msg").text("");
 		$("#loader").removeClass("visible").find(".loader_spinner").removeClass("visible");
 	});
+}
+
+function showDeleteConfirmationDialog(emailHash,subject){
+	let content=`
+		<div class="confirmation">
+			<div class="dialog_header">Are you sure?</div>
+			<div class="dialog_body">You are deleting the email with subject: <strong>${subject}</strong>! Are you sure you want to proceed?</div>
+			<div class="disalog_footer"><button>Yes</button> <button>Cancel</button></div>
+	`;
+
+	$("#modal_content").html(content).addClass("visible");
+	$("#modal").addClass(["visible","confirmation"]);
 }

@@ -361,11 +361,11 @@ table .time{
 	position:fixed;
 	left:50%;
 	top:50%;
-	min-width:50%;
+	/* min-width:50%; */
 	max-width:80%;
-	min-height:50%;
+	/* min-height:50%; */
 	max-height:80%;
-	height:80%;
+	/* height:80%; */
 	overflow-y:auto;
 	z-index:11;
 	transform:translate(-50%,-50%);
@@ -401,6 +401,22 @@ table .time{
 	margin-bottom: 20px;
 	text-align: center;
 	font-size: 24px;
+}
+#modal_content .dialog_header{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	padding: 10px 20px;
+	background: #ccc;
+}
+#modal_content .dialog_body {
+	margin: 40px 0 20px;
+}
+#modal.confirmation .close_btn:before,
+#modal.confirmation .close_btn:after{
+	background:#000;
+	z-index:11;
 }
 .footer_menu{
 	font-size:12px;
