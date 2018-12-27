@@ -459,6 +459,10 @@ function refresh_settings(callback){
 
 		var selected_tz=settings.timezone===undefined?"GMT":settings.timezone
 		$("#timezone_setting").find("option").removeAttr("selected").siblings("option[value='" + selected_tz + "']").attr("selected",true);
+		//select2 init
+		$('select').select2({
+			width: 'resolve'
+		});
 
 		//bind the user email to the contact form if the user has logged in!
 		if (settings.user && settings.user.verified && settings.user.email) {
