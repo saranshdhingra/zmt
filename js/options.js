@@ -189,6 +189,12 @@ jQuery(document).ready(function($){
 		else
 			settings.mail_tracking = false;
 
+		//debug
+		if ($("#chk_debug").prop("checked"))
+			settings.debug = true;
+		else
+			settings.debug = false;
+
 		let p2=$.post(base_url + "user/update_timezone", {
 			timezone : $("#timezone_setting").val(),
 			api_token: settings.user.api_token
@@ -400,6 +406,13 @@ function refresh_settings(callback){
 		}
 		else{
 			$("#chk_show_notifs").prop("checked", false);
+		}
+
+		if(settings.debug){
+			$("#chk_debug").prop("checked",true);
+		}
+		else{
+			$("#chk_debug").prop("checked",false);
 		}
 
 		var selected_tz=settings.timezone===undefined?"GMT":settings.timezone

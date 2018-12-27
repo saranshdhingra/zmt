@@ -15,6 +15,8 @@ chrome.runtime.onInstalled.addListener(function () {
 			
 		}
 	});
+
+	chrome.storage.local.set({"last_updated_time":(new Date()).toString()});
 });
 
 //open options page on Icon click

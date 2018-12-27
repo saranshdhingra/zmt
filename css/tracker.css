@@ -19,6 +19,23 @@
 	color: #fff;
 }
 
+#zmt_loader .cancel_div{
+	display:none;
+	color:#fff;
+	margin-top:10px;
+}
+#zmt_loader .cancel_div > a{
+	background: #f15757;
+	color: #fff;
+	padding: 5px 10px;
+	text-decoration: none;
+	border-radius: 5px;
+}
+
+#zmt_loader .cancel_div.visible{
+	display:block;
+}
+
 #zmt_loader.visible {
 	opacity: 1;
 	pointer-events: all;

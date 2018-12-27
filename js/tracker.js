@@ -4,6 +4,7 @@ var zmt_token,
 	base_url = "https://zohomailtracker.com/api/v2/",
 	zmt_settings,
 	zmtLoaderPromise,
+	zmtReloadCheckHandle,
 	zoho_patt = new RegExp("^mail\.zoho\.[a-z]+$");
 
 jQuery(document).ready(function($){
@@ -14,7 +15,7 @@ jQuery(document).ready(function($){
 	}
 
 	//add the zmt loader and alert HTML
-	$("body").append(`<div id='zmt_loader'><div class='loader_spinner' style='background:url(${chrome.extension.getURL('images/logo64.png')});'></div><div class='msg'></div></div>`);
+	$("body").append(`<div id='zmt_loader'><div class='loader_spinner' style='background:url(${chrome.extension.getURL('images/logo64.png')});'></div><div class='msg'></div><div class='cancel_div'>If this is taking time, you can <a href='#'>cancel the tracker</a> and send the mail untracked!</div></div>`);
 	$("body").append("<div id='zmt_app_alert'><div class='content'></div><div class='close'><i class='zmt_close_btn'></i></div></div>");
 
 	refresh_settings(function(){
@@ -34,12 +35,14 @@ jQuery(document).ready(function($){
 
 	//event handler for our fake button
 	$("body").on("click", "[data-zmt_event='s']", function (e) {
+		log("zmt btn event handler");
 		//even though there should be no event handler for this!
 		e.preventDefault();
 		e.stopImmediatePropagation();
 
 		//do our insertion if tracking is enabled
 		if (zmt_settings.mail_tracking) {
+			$(this).addClass("sending");
 			insert_tracker($(this));
 		}
 		else {
@@ -62,9 +65,22 @@ jQuery(document).ready(function($){
 		$("#zmt_app_alert").removeClass(["visible", "success", "error", "info"]);
 	});
 
+	//our failsafe that cancels the tracker and simply sends the mail
+	//in cases like it takes too long or something!
+	$("body").on("click","#zmt_loader .cancel_div a",function(e){
+		e.preventDefault();
+		log("Tracking canceled!");
+		$("[data-zmt_event='s'].sending").each(function(){
+			let btn=$(this);
+			zmtHideLoader(function(){
+				send_mail(btn);
+			});
+		});
+	});
+
 	//we call this repetitively so that hypothetically, if a person is writing a mail and the extension updates, it won't be able to insert a tracker.
 	//So, we update the user using our visuals!
-	setInterval(function(){
+	zmtReloadCheckHandle=setInterval(function () {
 		check_page_needs_reload();
 	},5000);
 
@@ -72,6 +88,7 @@ jQuery(document).ready(function($){
 
 //the function that gets the settings from localstorage and then stores a local copy of it!
 function refresh_settings(callback){
+	log("refreshing settings");
 	chrome.storage.local.get("zmt_settings", function (result) {
 		if (result.zmt_settings !== undefined) {
 			window.zmt_settings = JSON.parse(result.zmt_settings);
@@ -85,7 +102,9 @@ function refresh_settings(callback){
 //whenever the storage is changed,
 //we make sure to refresh it here
 chrome.storage.onChanged.addListener(function (changes, namespace) {
+	log("storage changed");
 	if (Object.keys(changes).indexOf("zmt_settings") != -1) {
+		log("zmt settings changed");
 		refresh_settings(function(){
 			//this makes sure if someone changes a setting, like user, mail tracking etc
 			//it is reflected in the emails that are opened w/o a need for reload
@@ -162,7 +181,8 @@ function replace_send_btn(el){
 }
 
 function insert_tracker(send_btn){
-	zmtShowLoader("Inserting tracker!");
+	log("inserting tracker");
+	zmtShowLoader("Inserting tracker!",true);
 	try{
 		//find the tracking pixel in this mail and the subject of the mail
 		var mail_body = send_btn.parents(".SC_mclst.zmCnew").children(".zmCE").find(".ze_area");
@@ -177,16 +197,20 @@ function insert_tracker(send_btn){
 		if(to_field.length==0){
 			zmtHideLoader(function(){
 				zmtShowAlert("Please fill up the Recepient!", "error");
+				send_btn.removeClass("sending");
 			});
 			return;
 		}
 
 		fetch_hash_from_server(send_btn, subject, to_field, cc_field, bcc_field, function (hash) {
+			log("fetch_hash_from_server callback");
 			var img_str = "<img src='" + base_url + "img/show?hash=" + hash + "' class='zmt_pixel' />";
-
+			log(img_str);
 			//first make sure that the hash is added to the list of hashes to be blocked, then append the image in the ,mail.
 			add_hash_to_local(hash, function () {
+				log("add_hash_to_local callback");
 				zmtHideLoader(function(){
+					log("zmtHideLoader callback");
 					mail_body.contents().find("body").append(img_str);
 					send_mail(send_btn);
 				});
@@ -194,7 +218,9 @@ function insert_tracker(send_btn){
 		});
 	}
 	catch(err){
+		log("Tracker failed",err);
 		zmtHideLoader(function(){
+			send_btn.removeClass("sending");
 			zmtShowAlert("Tracker inserting failed!","error");
 			send_mail(send_btn);
 		});
@@ -287,6 +313,7 @@ function fetch_hash_from_server(send_btn, subject, to_field, cc_field, bcc_field
 				});
 			}
 		}).fail(function(err){
+			log("request failed in fetch_hash_from_server",log);
 			zmtHideLoader(function () {
 				zmtShowAlert("Tracker inserting failed!", "error");
 				send_mail(send_btn);
@@ -294,6 +321,7 @@ function fetch_hash_from_server(send_btn, subject, to_field, cc_field, bcc_field
 		});
 	}
 	catch(err){
+		log("exception in fetch_hash_from_server",err);
 		zmtHideLoader(function () {
 			zmtShowAlert("Tracker inserting failed!", "error");
 			send_mail(send_btn);
@@ -304,15 +332,25 @@ function fetch_hash_from_server(send_btn, subject, to_field, cc_field, bcc_field
 //add a hash to the local list of hashes
 //let this task be handled by the background script
 function add_hash_to_local(hash, callback) {
-	chrome.runtime.sendMessage({
-		action: 'add_hash',
-		hash: hash
-	}, function () {
+	log("add_hash_to_local func for hash",hash);
+	try{
+		chrome.runtime.sendMessage({
+			action: 'add_hash',
+			hash: hash
+		}, function () {
+			log("chrome.runtime callback");
+			callback();
+		});
+	}
+	catch(err){
+		log("error in add_hash_to_local",err);
 		callback();
-	});
+	}
 }
 
 function send_mail(btn) {
+	log("send_mail called");
+	btn.removeClass("sending");
 	btn.attr("data-event", "s").removeAttr("data-zmt_event");
 	btn.find("b").trigger("click");
 }
@@ -338,6 +376,7 @@ function check_page_needs_reload(){
 		});
 	}
 	catch(err){
+		log("chrome.runtime throws exception, probably page needs reload",err);
 		//display the visual
 		$(".zmt_tracking_status").each(function(){
 			$(this).find("li").html(`<img src='${chrome.extension.getURL('images/tracker_failed.png ')}'data-tooltip='Tracker will not be inserted because The page needs a reload!'>`);
@@ -345,14 +384,19 @@ function check_page_needs_reload(){
 		//remove the tracker handler
 		$("[data-zmt_event='s']").removeAttr("data-zmt_event").attr("data-event","s");
 		window.needs_reload=true;
+		clearInterval(zmtReloadCheckHandle);
+		return;
 	}
 	window.needs_reload=false;
 }
 
 //the function that shows the loader inside UI
-function zmtShowLoader(msg){
+function zmtShowLoader(msg,cancellable){
 	$("#zmt_loader").find(".msg").text(msg);
 	$("#zmt_loader").addClass("visible").find(".loader_spinner").addClass("visible");
+	if(cancellable===true){
+		$("#zmt_loader").find(".cancel_div").addClass("visible");
+	}
 	zmtLoaderPromise = new Promise(function (resolve, reject) {
 		setTimeout(function () {
 			resolve();
@@ -381,4 +425,9 @@ function zmtShowAlert(msg,type){
 
 	$("#zmt_app_alert").find(".content").html(msg);
 	$("#zmt_app_alert").addClass(["visible", type]);
+}
+
+function log(){
+	if (zmt_settings && zmt_settings.debug)
+		console.log(arguments);
 }
