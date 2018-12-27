@@ -230,7 +230,7 @@ jQuery(document).ready(function($){
 	})
 
 	//modals
-	$(".modal_close").on("click",function(){
+	$("body").on("click",".modal_close",function(){
 		$("#modal").removeClass(["visible","confirmation"]);
 		setTimeout(function(){
 			$("#modal_content").html("");
@@ -326,6 +326,39 @@ jQuery(document).ready(function($){
 			subject=$(this).attr("data-subject");
 
 		showDeleteConfirmationDialog(email,subject);
+	});
+
+	//Delete the email when someone confirms
+	$("body").on("click", ".delete_email_confirmed",function(){
+		if(!settings.user || !settings.user.api_token){
+			show_alert("You must be logged in to do that action","error");
+			return;
+		}
+			
+		show_loader("Deleting the email!");
+		let hash=$(this).attr("data-email");
+		//send the request
+		$.post(base_url+`emails/${hash}/delete`,{
+			api_token:settings.user.api_token
+		},function(response){
+			if(response.code=="1"){
+				hide_loader();
+				load_history();
+				show_alert("The email was deleted!", "success");
+				$("#modal_close").trigger("click");
+				return;
+			}
+
+			log("email deletion rejected by server", hash, response);
+			hide_loader();
+			show_alert("The email could not be deleted!", "error");
+			$("#modal_close").trigger("click");
+		}).fail(function(err){
+			log("email deletion failed", hash, err);
+			hide_loader();
+			show_alert("The email could not be deleted!", "error");
+			$("#modal_close").trigger("click");
+		});
 	});
 
 	//contact section
@@ -471,8 +504,8 @@ function load_history(){
 			html+=`<tr>
 						<td>${(i+1)}</td>
 						<td>
-							<a href='#' data-email='${row.hash}' class='show_email_views btn'>Details</a>
-							<a href='#' data-email='${row.hash}' data-subject='${row.subject}' class='delete_email'>Delete</a>
+							<a href='#' data-email='${row.hash}' class='show_email_views'><i class='icon-login'></i></a>
+							<a href='#' data-email='${row.hash}' data-subject='${row.subject}' class='delete_email'><i class='icon-trash'></i></a>
 						</td>
 						<td>${row.subject}</td>
 						<td>${row.views_count}</td>
@@ -532,9 +565,14 @@ function showDeleteConfirmationDialog(emailHash,subject){
 		<div class="confirmation">
 			<div class="dialog_header">Are you sure?</div>
 			<div class="dialog_body">You are deleting the email with subject: <strong>${subject}</strong>! Are you sure you want to proceed?</div>
-			<div class="disalog_footer"><button>Yes</button> <button>Cancel</button></div>
+			<div class="disalog_footer"><button class='delete_email_confirmed' data-email="${emailHash}">Yes</button> <button class='modal_close'>Cancel</button></div>
 	`;
 
 	$("#modal_content").html(content).addClass("visible");
 	$("#modal").addClass(["visible","confirmation"]);
+}
+
+function log() {
+	if (settings && settings.debug)
+		console.log(arguments);
 }
