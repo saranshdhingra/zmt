@@ -361,6 +361,59 @@ jQuery(document).ready(function($){
 		});
 	});
 
+	//mute an email
+	$("body").on("click",".mute_email",function(e){
+		e.preventDefault();
+		let hash=$(this).attr("data-email");
+		log("Clicked mute email button for the email:"+hash);
+		show_loader("Trying to mute the email!");
+		$.post(`${base_url}emails/${hash}/mute`,{
+			api_token:settings.user.api_token
+		},function(response){
+			if(response.code=="1"){
+				hide_loader();
+				show_alert("The email has been muted!","success");
+				load_history();
+				return;
+			}
+
+			log("Server rejected the mute email request");
+			hide_loader();
+			show_alert(response.msg, "error");
+		}).fail(function(err){
+			load_history();
+			log("Server rejected the mute email request with the reason:",err);
+			hide_loader();
+			show_alert("Could not mute the email!", "error");
+		});
+	});
+
+	$("body").on("click", ".unmute_email", function (e) {
+		e.preventDefault();
+		let hash = $(this).attr("data-email");
+		log("Clicked unmute email button for the email:" + hash);
+		show_loader("Trying to unmute the email!");
+		$.post(`${base_url}emails/${hash}/unmute`, {
+			api_token: settings.user.api_token
+		}, function (response) {
+			if (response.code == "1") {
+				hide_loader();
+				show_alert("The email has been unmuted!", "success");
+				load_history();
+				return;
+			}
+
+			log("Server rejected the unmute email request");
+			hide_loader();
+			show_alert(response.msg, "error");
+		}).fail(function (err) {
+			load_history();
+			log("Server rejected the unmute email request with the reason:", err);
+			hide_loader();
+			show_alert("Could not unmute the email!", "error");
+		});
+	});
+
 	//contact section
 	$("#contact_form").on("submit",function(e){
 		e.preventDefault();
@@ -504,12 +557,14 @@ function load_history(){
 
 		var html="";
 		for(let i=0;i<response.history.length;i++){
-			let row=response.history[i];
+			let row=response.history[i],
+				mute_txt = (row.is_muted) ? `<a href='#' data-email='${row.hash}' class='unmute_email' title='Unmute'><i class='icon-eye'></i></a>` : `<a href='#' data-email='${row.hash}' class='mute_email' title='Mute'><i class='icon-eye-off'></i></a>`;
 			html+=`<tr>
 						<td>${(i+1)}</td>
 						<td>
 							<a href='#' data-email='${row.hash}' class='show_email_views'><i class='icon-login'></i></a>
 							<a href='#' data-email='${row.hash}' data-subject='${row.subject}' class='delete_email'><i class='icon-trash'></i></a>
+							${mute_txt}
 						</td>
 						<td>${row.subject}</td>
 						<td>${row.views_count}</td>
@@ -519,7 +574,6 @@ function load_history(){
 					</tr>`;
 		}
 		$("#history_table").find("tbody").html(html);
-
 	});
 }
 

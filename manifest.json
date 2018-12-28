@@ -3,7 +3,7 @@
 	"name": "Zoho Mail Tracker",
 	"short_name":"ZMT",
 	"description": "This extensions helps you track the emails you send using Zoho Mail.",
-	"version": "2.1.1",
+	"version": "2.2",
 	"icons":{
 				"16": "images/logo16.png",
 				"32": "images/logo32.png",
