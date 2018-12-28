@@ -23,8 +23,16 @@ jQuery(document).ready(function($){
 	});
 
 	//triggers when any one of the "To","CC","BCC","Subject" fields is changed
-	$("body").on("keyup keypress focus blur change", ".zmCTxt .zm_sgst,.zmCTxt.subject-field>input,.ze_area", function (e) {
-		check_send_btn($(this));
+	// $("body").on("keyup keypress focus blur change", ".zmCTxt .zm_sgst,.zmCTxt.subject-field>input,.ze_area", function (e) {
+	// 	check_send_btn($(this));
+	// });
+
+	//drafts
+	// $("body").on("click", ".zmList", function (e) {
+	// 	check_send_btn($(this),true);
+	// });
+	$("body").on("mousemove", ".SCm",function(){
+		check_send_btn($(this).find("[data-event='s']:not(.sending)"));
 	});
 
 	// $("body").on("click", ".zm_ry>span", function () {
@@ -108,7 +116,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 		refresh_settings(function(){
 			//this makes sure if someone changes a setting, like user, mail tracking etc
 			//it is reflected in the emails that are opened w/o a need for reload
-			$("[data-event='s'],[data-zmt_event='s']").each(function () {
+			$("[data-event='s']:not(.sending),[data-zmt_event='s']:not(.sending)").each(function () {
 				var btn = $(this);
 				replace_send_btn(btn);
 			});
@@ -119,7 +127,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 //function that checks that the send button exists in the DOM.
 //if recurse is true and there is not send btn(near the el) , it will keep calling itself recursively.
 function check_send_btn(el, recurse) {
-	if (el.parents(".SC_mclst.zmCnew").find(".SCtxt[data-event='s']").length == 0) {
+	if (el.parents(".SC_mclst.zmCnew").find(".SCtxt[data-event='s']:not(.sending)").length == 0) {
 		//if you want to recurse
 		if (recurse)
 			setTimeout(function () {
@@ -338,8 +346,9 @@ function add_hash_to_local(hash, callback) {
 			action: 'add_hash',
 			hash: hash
 		}, function () {
+			//this part is not running at times!
 			log("chrome.runtime callback");
-			callback();
+			callback();	
 		});
 	}
 	catch(err){

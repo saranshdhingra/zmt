@@ -50,6 +50,7 @@ jQuery(document).ready(function($){
 		e.preventDefault();
 		settings={};
 		update_settings();
+		load_history();
 		show_alert("You have been logged out!","info");
 	});
 
