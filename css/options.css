@@ -152,6 +152,8 @@ input[type="text"],
 input[type="email"],
 select,
 textarea{
+	display: inline-block;
+	vertical-align: middle;
 	padding: 10px;
 	font-size: 12px;
 	border: 1px solid #ccc;
@@ -289,6 +291,8 @@ select#history_per_page_select{
 	border-radius: 50%;
 }
 button {
+	display:inline-block;
+	vertical-align:middle;
 	width: 100px;
 	background: #6ed3cf;
 	padding: 10px 20px;
@@ -355,6 +359,11 @@ table tbody td{
 }
 table tbody tr:nth-child(odd) td{
 	background:#ebebeb;
+}
+.search_row td{
+	background:#fff;
+	border:none;
+	text-align:right;
 }
 #history_div .to_field_cell,
 #history_div .cc_field_cell,

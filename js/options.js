@@ -11,10 +11,10 @@ var settings = {
 	loaderPromise,
 	UserHistory={
 		pageNum:1,
-		perPage:10
+		perPage: env.userHistory.defaultPerPage,
+		search:''
 	};
 
-console.log(history);
 jQuery(document).ready(function($){
 
 	//last seen version reset(for the NEW badge)
@@ -443,15 +443,33 @@ jQuery(document).ready(function($){
 		})
 	});
 
+	//history pagination page num
 	$("body").on("change", "#history_page_num_select",function(){
 		UserHistory.pageNum = $(this).val();
 		load_history();
 	});
 
+	//history pagination per page
 	$("body").on("change", "#history_per_page_select", function () {
 		UserHistory.perPage = $(this).val();
 		UserHistory.pageNum = 1;	//this is important as the num of pages might change depending on the perPage value
 		load_history();
+	});
+
+	//history search
+	$("#history_search_btn").on("click",function(){
+		let searchTerm=$("#history_search").val().trim();
+		UserHistory.searchTerm=searchTerm;
+		UserHistory.pageNum=1;
+		UserHistory.perPage=env.userHistory.defaultPerPage;
+		load_history();
+	});
+
+	//pressing enter should also trigger a search
+	$("#history_search").on("keypress",function(e){
+		if(e.which==13){
+			$("#history_search_btn").trigger("click");
+		}
 	});
 });
 
@@ -567,7 +585,8 @@ function load_history(){
 	$.post(base_url + "user/history", {
 		api_token:settings.user.api_token,
 		per_page:UserHistory.perPage,
-		page_num:UserHistory.pageNum
+		page_num:UserHistory.pageNum,
+		search_term:UserHistory.searchTerm
 	}, function (response) {
 		$("#history_div").removeClass("loading");
 		if(!response.history || response.history.length==0){
@@ -614,6 +633,10 @@ function load_history(){
 				selectedString=(perPageArr[i-1]==response.per_page)?"selected":"";
 				perPageOptions+=`<option ${selectedString}>${perPageArr[i-1]}</option>`;
 			}
+		}
+
+		if(response.search_term!==undefined){
+			$("#history_search").val(response.search_term);
 		}
 
 		html+=`<tr class="pagination">
