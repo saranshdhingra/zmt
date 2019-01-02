@@ -8,7 +8,13 @@ var settings = {
 	base_url = env.baseUrl,
 	timezones = helpers.timezones,
 	alertCloseTimeoutHandle,
-	loaderPromise;
+	loaderPromise,
+	UserHistory={
+		pageNum:1,
+		perPage:10
+	};
+
+console.log(history);
 jQuery(document).ready(function($){
 
 	//last seen version reset(for the NEW badge)
@@ -436,6 +442,17 @@ jQuery(document).ready(function($){
 			}
 		})
 	});
+
+	$("body").on("change", "#history_page_num_select",function(){
+		UserHistory.pageNum = $(this).val();
+		load_history();
+	});
+
+	$("body").on("change", "#history_per_page_select", function () {
+		UserHistory.perPage = $(this).val();
+		UserHistory.pageNum = 1;	//this is important as the num of pages might change depending on the perPage value
+		load_history();
+	});
 });
 
 //updates the local storage with the current settings object
@@ -548,7 +565,9 @@ function load_history(){
 	$("#history_div").addClass("loading");
 
 	$.post(base_url + "user/history", {
-		api_token:settings.user.api_token
+		api_token:settings.user.api_token,
+		per_page:UserHistory.perPage,
+		page_num:UserHistory.pageNum
 	}, function (response) {
 		$("#history_div").removeClass("loading");
 		if(!response.history || response.history.length==0){
@@ -569,11 +588,50 @@ function load_history(){
 						</td>
 						<td>${row.subject}</td>
 						<td>${row.views_count}</td>
-						<td>${row.to_field}</td>
-						<td>${row.cc_field}</td>
-						<td>${row.bcc_field}</td>
+						<td class="to_field_cell">${row.to_field}</td>
+						<td class="cc_field_cell">${row.cc_field}</td>
+						<td class="bcc_field_cell">${row.bcc_field}</td>
 					</tr>`;
 		}
+
+		//now add the pagination parts
+		let pageNumOptions=`<option>${UserHistory.pageNum}</option>`,
+			perPageOptions=`<option>${UserHistory.perPage}</option>`;
+
+		if(response.page_num!==undefined && response.num_pages!==undefined){
+			pageNumOptions="";
+			let selectedString="";
+			for(let i=1;i<=response.num_pages;i++){
+				selectedString=(i==response.page_num)?"selected":"";
+				pageNumOptions+=`<option ${selectedString}>${i}</option>`
+			}
+		}
+
+		if(response.per_page!==undefined){
+			perPageOptions="";
+			let perPageArr=[5,10,25,50];
+			for(let i=1;i<=perPageArr.length;i++){
+				selectedString=(perPageArr[i-1]==response.per_page)?"selected":"";
+				perPageOptions+=`<option ${selectedString}>${perPageArr[i-1]}</option>`;
+			}
+		}
+
+		html+=`<tr class="pagination">
+					<td colspan="7">
+						<label style="float:left;">
+							<span>Page Num:</span>
+							<select id="history_page_num_select">
+								${pageNumOptions}
+							</select>
+						</label>
+						<label style="float:right;">
+							<span>Per Page:</span>
+							<select id="history_per_page_select">
+								${perPageOptions}
+							</select>
+						</label>
+					</td>
+				</tr>`;
 		$("#history_table").find("tbody").html(html);
 	});
 }

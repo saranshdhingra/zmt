@@ -177,6 +177,12 @@ input[type="number"] {
 	height: 30px;
 	text-align: center;
 }
+/*pagination select boxes*/
+select#history_page_num_select,
+select#history_per_page_select{
+	min-width:0;
+	padding:5px;
+}
 .accordion{
 	list-style: none;
 	padding-left: 0;
@@ -349,6 +355,11 @@ table tbody td{
 }
 table tbody tr:nth-child(odd) td{
 	background:#ebebeb;
+}
+#history_div .to_field_cell,
+#history_div .cc_field_cell,
+#history_div .bcc_field_cell{
+	word-break:break-all;
 }
 table .time{
 	white-space:nowrap;
