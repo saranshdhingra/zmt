@@ -562,7 +562,7 @@ function load_history(){
 				mute_txt = (row.is_muted) ? `<a href='#' data-email='${row.hash}' class='unmute_email' title='Unmute'><i class='icon-eye'></i></a>` : `<a href='#' data-email='${row.hash}' class='mute_email' title='Mute'><i class='icon-eye-off'></i></a>`;
 			html+=`<tr>
 						<td>${(i+1)}</td>
-						<td>
+						<td class="actions_cell">
 							<a href='#' data-email='${row.hash}' class='show_email_views'><i class='icon-login'></i></a>
 							<a href='#' data-email='${row.hash}' data-subject='${row.subject}' class='delete_email'><i class='icon-trash'></i></a>
 							${mute_txt}

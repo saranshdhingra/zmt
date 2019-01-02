@@ -331,6 +331,9 @@ button.hidden{
 #history_div.loading .loader{
 	display: block;
 }
+#history_div .actions_cell {
+	white-space: nowrap;
+}
 table{
 	border-collapse: collapse;
 	border-spacing: 0;
