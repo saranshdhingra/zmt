@@ -152,6 +152,8 @@ input[type="text"],
 input[type="email"],
 select,
 textarea{
+	display: inline-block;
+	vertical-align: middle;
 	padding: 10px;
 	font-size: 12px;
 	border: 1px solid #ccc;
@@ -176,6 +178,12 @@ input[type="number"] {
 	width: 60px;
 	height: 30px;
 	text-align: center;
+}
+/*pagination select boxes*/
+select#history_page_num_select,
+select#history_per_page_select{
+	min-width:0;
+	padding:5px;
 }
 .accordion{
 	list-style: none;
@@ -283,6 +291,8 @@ input[type="number"] {
 	border-radius: 50%;
 }
 button {
+	display:inline-block;
+	vertical-align:middle;
 	width: 100px;
 	background: #6ed3cf;
 	padding: 10px 20px;
@@ -352,6 +362,16 @@ table tbody td{
 }
 table tbody tr:nth-child(odd) td{
 	background:#ebebeb;
+}
+.search_row td{
+	background:#fff;
+	border:none;
+	text-align:right;
+}
+#history_div .to_field_cell,
+#history_div .cc_field_cell,
+#history_div .bcc_field_cell{
+	word-break:break-all;
 }
 table .time{
 	white-space:nowrap;
