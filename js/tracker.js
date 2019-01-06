@@ -143,6 +143,7 @@ function check_send_btn(el, recurse) {
 //button used to replce attr of send button so we can capture its click.
 //basically our fake button
 function replace_send_btn(el){
+	log("inside replace_send_btn");
 	var send_btn = el.parents(".SC_mclst.zmCnew").find(".SCtxt[data-event='s']").length ? el.parents(".SC_mclst.zmCnew").find(".SCtxt[data-event='s']"):el.parents(".SC_mclst.zmCnew").find(".SCtxt[data-zmt_event='s']"),
 		parent = send_btn.parents(".SC_flt"),
 		sender = getEmailSender(send_btn),
