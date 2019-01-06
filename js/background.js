@@ -52,12 +52,13 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 			if (hashes.indexOf(hash) == -1)
 				hashes.push(request.hash);
 			zmt_settings.hashes = hashes;
-			sendResponse({});
+			sendResponse({'action':'done'});
 			chrome.storage.local.set({
 				zmt_settings: JSON.stringify(zmt_settings)
 			});
 		});
 	}
+	return true;
 });
 
 
