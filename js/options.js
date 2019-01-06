@@ -150,7 +150,10 @@ jQuery(document).ready(function($){
 						settings.hashes = response.user.hashes;
 
 					show_alert("User verified!", "success");
-					update_settings();
+					update_settings(true,function(){
+						log("callback inside update_settings");
+						load_history();
+					});
 				}
 				catch(err){
 					show_alert("There was an error in verifying the user, please try again!","error");
@@ -468,7 +471,7 @@ jQuery(document).ready(function($){
 
 //updates the local storage with the current settings object
 function update_settings(do_refresh,cb){
-
+	log("inside update_settings func");
 	//if the user wants to show notifications, but doesn't have any channel stored
 	//Then we simply switch off the show_notifications toggle
 	if (settings.show_notifications && !(settings.user && settings.user.channel)){
@@ -478,9 +481,15 @@ function update_settings(do_refresh,cb){
 	chrome.storage.local.set({
 		'zmt_settings': JSON.stringify(settings)
 	}, function () {
-		if(do_refresh===undefined || do_refresh)
-			refresh_settings();
-		if(cb!==undefined)
+		log("inside chrome.storage.local.set");
+		if(do_refresh===undefined || do_refresh){
+			log("inside do_refresh");
+			if(cb!==undefined)
+				refresh_settings(cb);
+			else
+				refresh_settings();
+		}
+		else if(cb!==undefined)
 			cb();
 	});
 }
