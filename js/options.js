@@ -13,7 +13,13 @@ var settings = {
 		pageNum:1,
 		perPage: env.userHistory.defaultPerPage,
 		search:''
-	};
+	},
+	activeEmail={
+		hash:'',
+		pageNum:1,
+		perPage: env.userHistory.defaultPerPage,
+		searchTerm:''
+	}
 
 jQuery(document).ready(function($){
 
@@ -39,12 +45,8 @@ jQuery(document).ready(function($){
 		let emailHash = helpers.getParameterByName("email", window.location.href);
 		//only do something when we have come from the notification if the notification was meant for the logged in user!
 		if (emailHash != null && settings.hashes && settings.hashes.indexOf(emailHash) != -1) {
-			let el = $(`<a href='#' class='show_email_views' data-email='${emailHash}'></a>`);
-			$("body").append(el);
-			setTimeout(function () {
-				el.trigger("click");
-				el.remove();
-			}, 0);
+			activeEmail.hash=emailHash;
+			loadSingleEmailDetails();
 		}
 
 		//fetch the history
@@ -241,6 +243,12 @@ jQuery(document).ready(function($){
 		$("#modal").removeClass(["visible","confirmation"]);
 		setTimeout(function(){
 			$("#modal_content").html("");
+			activeEmail={
+				hash:'',
+				pageNum:1,
+				perPage:env.userHistory.defaultPerPage,
+				searchTerm:''
+			};
 		},600);
 	});
 
@@ -280,50 +288,8 @@ jQuery(document).ready(function($){
 	$("body").on("click", ".show_email_views", function (e) {
 		e.preventDefault();
 		var hash = $(this).attr("data-email");
-		show_loader("Loading details of the email!");
-		$.post(base_url + `emails/${hash}/details`, {
-			api_token: settings.user.api_token
-		}, function (response) {
-			hide_loader();
-			if(response.code=="0"){
-				show_alert(response.msg,"error");
-				return;
-			}
-			let html = `
-					<div class='email_subject'><strong>Email: </strong> ${response.subject}</div>
-					<table class="email_views">
-						<thead>
-							<tr>
-								<td>S.No.</td>
-								<td>IP</td>
-								<td>Device</td>
-								<td>Location</td>
-								<td>User Agent</td>
-								<td>Time</td>
-							</tr>
-						</thead>
-						<tbody>
-				`;
-			if (response.details.length == 0)
-				html += "<tr><td colspan=6 style='text-align:center;'>This email hasn't been viewed yet!</td></tr>";
-			else {
-				for (let i = 0; i < response.details.length; i++) {
-					let row = response.details[i];
-					html += `
-							<tr class="email_view">
-								<td>${(i+1)}</td>
-								<td>${row.user_ip}</td>
-								<td>${row.device}</td>
-								<td>${row.location}</td>
-								<td>${row.user_agent}</td>
-								<td><div class="time">${row.viewed_at}</div></td>
-							</tr>
-						`;
-				}
-			}
-			html += `</tbody></table>`;
-			show_modal(html, 'success', 'Success!');
-		});
+		activeEmail.hash=hash;
+		loadSingleEmailDetails();
 	});
 
 	//'Delete' button in the history
@@ -469,6 +435,33 @@ jQuery(document).ready(function($){
 	$("#history_search").on("keypress",function(e){
 		if(e.which==13){
 			$("#history_search_btn").trigger("click");
+		}
+	});
+
+	//email views pagination page num
+	$("body").on("change", "#email_views_page_num_select", function () {
+		activeEmail.pageNum = $(this).val();
+		loadSingleEmailDetails();
+	});
+
+	//email_views pagination per page
+	$("body").on("change", "#email_views_per_page_select", function () {
+		activeEmail.perPage = $(this).val();
+		activeEmail.pageNum=1;
+		loadSingleEmailDetails();
+	});
+
+	//email_views search
+	$("body").on("click", "#email_views_search_btn", function () {
+		activeEmail.searchTerm = $("#email_views_search").val().trim();
+		activeEmail.pageNum=1;
+		loadSingleEmailDetails();
+	});
+
+	//pressing enter should also trigger a search
+	$("body").on("keypress", "#email_views_search", function (e) {
+		if (e.which == 13) {
+			$("#email_views_search_btn").trigger("click");
 		}
 	});
 });
@@ -656,6 +649,115 @@ function load_history(){
 					</td>
 				</tr>`;
 		$("#history_table").find("tbody").html(html);
+	});
+}
+
+function loadSingleEmailDetails(){
+	show_loader("Loading details of the email!");
+
+	let pageNum=activeEmail.pageNum||1;
+	let perPage=activeEmail.perPage || env.userHistory.defaultPerPage;
+	let searchTerm=activeEmail.searchTerm||'';
+	let valueStr='';
+
+	$.post(base_url + `emails/${activeEmail.hash}/details`, {
+		api_token: settings.user.api_token,
+		page_num:pageNum,
+		per_page:perPage,
+		search_term:searchTerm
+	}, function (response) {
+		hide_loader();
+		if (response.code == "0") {
+			show_alert(response.msg, "error");
+			return;
+		}
+
+		if(response.search_term!==undefined && response.search_term!=null && response.search_term.length)
+			valueStr=`value="${response.search_term}"`;
+
+		let html = `
+					<div class='email_subject'><strong>Email: </strong> ${response.subject}</div>
+					<table class="email_views">
+						<thead>
+							<tr class="search_row">
+								<td colspan="7"><input type="text" id="email_views_search" placeholder="Search Text" ${valueStr}><button id="email_views_search_btn">Search</button></td>
+							</tr>
+							<tr>
+								<td>S.No.</td>
+								<td>IP</td>
+								<td>Device</td>
+								<td>Location</td>
+								<td>User Agent</td>
+								<td>Time</td>
+							</tr>
+						</thead>
+						<tbody>
+				`;
+		if (response.details.length == 0)
+			html += "<tr><td colspan=6 style='text-align:center;'>This email hasn't been viewed yet!</td></tr>";
+		else {
+			for (let i = 0; i < response.details.length; i++) {
+				let row = response.details[i];
+				html += `
+							<tr class="email_view">
+								<td>${(i + 1)}</td>
+								<td>${row.user_ip}</td>
+								<td>${row.device}</td>
+								<td>${row.location}</td>
+								<td>${row.user_agent}</td>
+								<td><div class="time">${row.viewed_at}</div></td>
+							</tr>
+						`;
+			}
+
+			//now add the pagination parts
+			let pageNumOptions = `<option>1</option>`,
+				perPageOptions = `<option>10</option>`;
+
+			if (response.page_num !== undefined && response.num_pages !== undefined) {
+				pageNumOptions = "";
+				let selectedString = "";
+				for (let i = 1; i <= response.num_pages; i++) {
+					selectedString = (i == response.page_num) ? "selected" : "";
+					pageNumOptions += `<option ${selectedString}>${i}</option>`
+				}
+			}
+
+			if (response.per_page !== undefined) {
+				perPageOptions = "";
+				let perPageArr = [5, 10, 25, 50];
+				for (let i = 1; i <= perPageArr.length; i++) {
+					selectedString = (perPageArr[i - 1] == response.per_page) ? "selected" : "";
+					perPageOptions += `<option ${selectedString}>${perPageArr[i - 1]}</option>`;
+				}
+			}
+
+			if (response.search_term !== undefined) {
+				$("#email_views_search").val(response.search_term);
+			}
+
+			html += `<tr class="pagination">
+					<td colspan="7">
+						<label style="float:left;">
+							<span>Page Num:</span>
+							<select id="email_views_page_num_select">
+								${pageNumOptions}
+							</select>
+						</label>
+						<label style="float:right;">
+							<span>Per Page:</span>
+							<select id="email_views_per_page_select">
+								${perPageOptions}
+							</select>
+						</label>
+					</td>
+				</tr>`;
+		}
+		html += `</tbody></table>`;
+		show_modal(html, 'success', 'Success!');
+	}).fail(function(err){
+		log("Server gave an error!");
+		log(err);
 	});
 }
 

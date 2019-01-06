@@ -185,6 +185,9 @@ select#history_per_page_select{
 	min-width:0;
 	padding:5px;
 }
+button#email_views_search_btn{
+	margin-right:-20px;
+}
 .accordion{
 	list-style: none;
 	padding-left: 0;
