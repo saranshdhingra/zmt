@@ -1,5 +1,6 @@
 var zmt_token,
 	doc_user_email,
+	imgs_url=chrome.extension.getURL('images/'),
 	needs_reload=false,
 	base_url = "https://zohomailtracker.com/api/v2/",
 	zmt_settings,
@@ -15,7 +16,7 @@ jQuery(document).ready(function($){
 	}
 
 	//add the zmt loader and alert HTML
-	$("body").append(`<div id='zmt_loader'><div class='loader_spinner' style='background:url(${chrome.extension.getURL('images/logo64.png')});'></div><div class='msg'></div><div class='cancel_div'>If this is taking time, you can <a href='#'>cancel the tracker</a> and send the mail untracked!</div></div>`);
+	$("body").append(`<div id='zmt_loader'><div class='loader_spinner' style='background:url(${imgs_url}logo64.png);'></div><div class='msg'></div><div class='cancel_div'>If this is taking time, you can <a href='#'>cancel the tracker</a> and send the mail untracked!</div></div>`);
 	$("body").append("<div id='zmt_app_alert'><div class='content'></div><div class='close'><i class='zmt_close_btn'></i></div></div>");
 
 	refresh_settings(function(){
@@ -149,7 +150,7 @@ function replace_send_btn(el){
 		sender = getEmailSender(send_btn),
 		tracking_str;
 	if (zmt_settings && zmt_settings.mail_tracking && zmt_settings.user && zmt_settings.user.verified &&  !window.needs_reload && sender==zmt_settings.user.email) {
-		tracking_str=`<ul class='zmt_tracking_status'><li><img src='${chrome.extension.getURL('images/tracker_inserted.png')}' data-tooltip="Tracker will be inserted on 'Send'"></li></ul>`;
+		tracking_str = `<ul class='zmt_tracking_status'><li><img src='${imgs_url}tracker_inserted.png' data-tooltip="Tracker will be inserted on 'Send'"></li></ul>`;
 		
 		//so that I can replace it back!
 		send_btn.attr("data-zmt_event", "s").removeAttr("data-event");
@@ -176,7 +177,7 @@ function replace_send_btn(el){
 
 		failed_reason = `Tracker will not be inserted because ${failed_reason}`;
 			
-		tracking_str = `<ul class='zmt_tracking_status'><li><img src='${chrome.extension.getURL('images/tracker_failed.png')}' data-tooltip='${failed_reason}'></li></ul>`;
+		tracking_str = `<ul class='zmt_tracking_status'><li><img src='${imgs_url}tracker_failed.png' data-tooltip='${failed_reason}'></li></ul>`;
 
 		//we remove our custom event attribute so that even if we are not inserting a tracker, people can still send the emails
 		//The need for this arised when we started realtime sync instead of a simple reload.
@@ -389,7 +390,7 @@ function check_page_needs_reload(){
 		log("chrome.runtime throws exception, probably page needs reload",err);
 		//display the visual
 		$(".zmt_tracking_status").each(function(){
-			$(this).find("li").html(`<img src='${chrome.extension.getURL('images/tracker_failed.png ')}'data-tooltip='Tracker will not be inserted because The page needs a reload!'>`);
+			$(this).find("li").html(`<img src='${imgs_url}tracker_failed.png' data-tooltip='Tracker will not be inserted because The page needs a reload!'>`);
 		});
 		//remove the tracker handler
 		$("[data-zmt_event='s']").removeAttr("data-zmt_event").attr("data-event","s");

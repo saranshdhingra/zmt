@@ -31,11 +31,11 @@ chrome.webRequest.onBeforeRequest.addListener(function (info) {
 	var hash = helpers.getParameterByName("hash", info.url);
 	if (window.zmt_settings && window.zmt_settings.hashes && window.zmt_settings.hashes.indexOf(hash) != -1) {
 		return {
-			redirectUrl: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+			redirectUrl: "https://zohomailtracker.com/images/onepix.gif"
 		};
 	}
 }, {
-	urls: ["*://zohomailtracker.com/api/v2/img/show*"]
+	urls: ["*://zohomailtracker.com/api/v2/img/*"]
 }, ["blocking"]);
 
 //message passing receiver

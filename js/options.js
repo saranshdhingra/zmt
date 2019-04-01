@@ -32,6 +32,8 @@ jQuery(document).ready(function($){
 		});
 	});
 
+	$("#app_version").text(chrome.app.getDetails().version);
+
 	//populate the timezone select box
 	var t_arr=timezones.split(","),options="";
 	for(let i=0;i<t_arr.length;i++){
