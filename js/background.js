@@ -109,8 +109,6 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 
 
 pubnub.addListener({
-	status: function (statusEvent) {
-	},
 	message: function (message) {
 		// handle message
 		try{
@@ -142,9 +140,6 @@ pubnub.addListener({
 		}
 		catch(err){
 		}
-	},
-	presence: function (presenceEvent){
-		// handle presence
 	}
 });
 

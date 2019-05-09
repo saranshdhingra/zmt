@@ -195,7 +195,7 @@ function insert_tracker(send_btn){
 	zmtShowLoader("Inserting tracker!",true);
 	try{
 		//find the tracking pixel in this mail and the subject of the mail
-		var mail_body = send_btn.parents(".SC_mclst.zmCnew").children(".zmCE").find(".ze_area");
+		var mail_body = send_btn.parents(".SC_mclst.zmCnew").find(".zmCE").find(".ze_area");
 
 		remove_current_pixels_from_mail(mail_body);
 
