@@ -269,15 +269,6 @@ jQuery(document).ready(function($){
 		}
 	});
 
-	//dismiss button on the alerts
-	$(".announcement").find(".dismiss").on("click", function (e) {
-		e.preventDefault();
-		$(this).parent(".announcement").slideUp(function () {
-			chrome.storage.local.set({
-				'alert_dismissed':true
-			},function(){});
-		});
-	});
 
 	//options page notifications
 	$("#app_notifs").find(".close").on("click",function(){
@@ -567,13 +558,6 @@ function refresh_settings(callback){
 
 		if(callback!==undefined)
 			callback();
-	});
-
-	//
-	chrome.storage.local.get('alert_dismissed',function(result){
-		if(!result.alert_dismissed){
-			$(".announcement").slideDown();
-		}
 	});
 }
 
