@@ -1,4 +1,76 @@
-var prevSubscribedChannel="";
+class PubNubManager{
+	constructor(){
+		this.pubnub=false;
+		this.channelName=false;
+	}
+
+	initPubnub(){
+		if(this.pubnub===false){
+			console.log("initializing pubnub");
+			this.pubnub = new PubNub({
+				subscribeKey: env.pubnub.subscribeKey,
+				ssl: true
+			});
+
+			this.pubnub.addListener({
+				message: function (message) {
+					// handle message
+					try{
+						let type=message.message.type;
+						if(type=="emailView"){
+							chrome.notifications.create(`zmt_email_${message.message.id}`,{
+								type:'basic',
+								title:'Someone viewed an email!',
+								message: `Subject: ${message.message.sub}\nLocation: ${message.message.location}`,
+								iconUrl: 'images/icon_notif.png'
+							});
+						}
+						else if(type=="contact"){
+							chrome.notifications.create(`zmt_contact_${(new Date()).getMilliseconds()}`, {
+								type: 'basic',
+								title: 'Someone sent a contact entry!',
+								message: `Type:${message.message.contactType}\nEmail:${message.message.email}`,
+								iconUrl: 'images/icon_notif.png'
+							});
+						}
+						else if(type=="global"){
+							chrome.notifications.create(`zmt_global_${(new Date()).getMilliseconds()}`, {
+								type: 'basic',
+								title: message.message.title,
+								message: message.message.body,
+								iconUrl: 'images/icon_notif.png'
+							});
+						}
+					}
+					catch(err){
+					}
+				}
+			});
+		}
+	}
+
+	attachChannel(name){
+		//no need to resubscribe
+		if(this.pubnub!==false && name!==false && this.channelName!=name){
+			this.pubnub.subscribe({
+				// channels: [zmt_settings.user.channel],
+				channels: [name]
+			});
+			this.channelName=name;
+		}
+	}
+
+	detachChannel(){
+		if(this.pubnub!==false && this.channelName!==false){
+			this.pubnub.unsubscribe({
+				channels:[this.channelName]
+			});
+			this.channelName=false;
+		}
+	}
+}
+
+var pubnubManager=new PubNubManager();
 //when extension is loaded
 chrome.runtime.onInstalled.addListener(function () {
 	refresh_settings();
@@ -62,34 +134,18 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 });
 
 
-
-//pubnub
-var pubnub = new PubNub({
-	subscribeKey: env.pubnub.subscribeKey,
-	ssl: true
-});
-
-
 //function that simply gets the settings and stores them
 function refresh_settings(callback) {
 	chrome.storage.local.get("zmt_settings", function (result) {
 		if (result.zmt_settings !== undefined) {
 			window.zmt_settings = JSON.parse(result.zmt_settings);
 
-
-			//unsubscribe from the prev pubnub channel, just to stay updated
-			//i.e if anything changes like the user logs out, or someone else logs in!
-			pubnub.unsubscribe({
-				channels:[prevSubscribedChannel]
-			});
-
-			if(zmt_settings.user!==undefined && zmt_settings.user.verified && zmt_settings.user.channel!==undefined && pubnub!==undefined && zmt_settings.show_notifications){
-				pubnub.subscribe({
-					channels: ['global',zmt_settings.user.channel],
-				});
-
-				//update the channel that was subscribed last
-				prevSubscribedChannel=zmt_settings.user.channel;
+			if(zmt_settings.user!==undefined && zmt_settings.user.verified && zmt_settings.user.channel!==undefined && zmt_settings.show_notifications){
+				pubnubManager.initPubnub();
+				pubnubManager.attachChannel(zmt_settings.user.channel);
+			}
+			else{
+				pubnubManager.detachChannel();
 			}
 		}
 
@@ -107,42 +163,6 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 	}
 });
 
-
-pubnub.addListener({
-	message: function (message) {
-		// handle message
-		try{
-			let type=message.message.type;
-			if(type=="emailView"){
-				chrome.notifications.create(`zmt_email_${message.message.id}`,{
-					type:'basic',
-					title:'Someone viewed an email!',
-					message: `Subject: ${message.message.sub}\nLocation: ${message.message.location}`,
-					iconUrl: 'images/icon_notif.png'
-				});
-			}
-			else if(type=="contact"){
-				chrome.notifications.create(`zmt_contact_${(new Date()).getMilliseconds()}`, {
-					type: 'basic',
-					title: 'Someone sent a contact entry!',
-					message: `Type:${message.message.contactType}\nEmail:${message.message.email}`,
-					iconUrl: 'images/icon_notif.png'
-				});
-			}
-			else if(type=="global"){
-				chrome.notifications.create(`zmt_global_${(new Date()).getMilliseconds()}`, {
-					type: 'basic',
-					title: message.message.title,
-					message: message.message.body,
-					iconUrl: 'images/icon_notif.png'
-				});
-			}
-		}
-		catch(err){
-		}
-	}
-});
-
 chrome.notifications.onClicked.addListener(function(notifId){
 	let arr = notifId.split("_"),
 		type = arr[1],
@@ -153,4 +173,4 @@ chrome.notifications.onClicked.addListener(function(notifId){
 		chrome.tabs.create({
 			url: `options.html?email=${emailId}`
 		});
-})
+});
