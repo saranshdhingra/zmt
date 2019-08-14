@@ -9,7 +9,7 @@ var settings = {
 	timezones = helpers.timezones,
 	alertCloseTimeoutHandle,
 	loaderPromise,
-	UserHistory={
+	userHistory={
 		pageNum:1,
 		perPage: env.userHistory.defaultPerPage,
 		search:''
@@ -407,23 +407,23 @@ jQuery(document).ready(function($){
 
 	//history pagination page num
 	$("body").on("change", "#history_page_num_select",function(){
-		UserHistory.pageNum = $(this).val();
+		userHistory.pageNum = $(this).val();
 		load_history();
 	});
 
 	//history pagination per page
 	$("body").on("change", "#history_per_page_select", function () {
-		UserHistory.perPage = $(this).val();
-		UserHistory.pageNum = 1;	//this is important as the num of pages might change depending on the perPage value
+		userHistory.perPage = $(this).val();
+		userHistory.pageNum = 1;	//this is important as the num of pages might change depending on the perPage value
 		load_history();
 	});
 
 	//history search
 	$("#history_search_btn").on("click",function(){
 		let searchTerm=$("#history_search").val().trim();
-		UserHistory.searchTerm=searchTerm;
-		UserHistory.pageNum=1;
-		UserHistory.perPage=env.userHistory.defaultPerPage;
+		userHistory.searchTerm=searchTerm;
+		userHistory.pageNum=1;
+		userHistory.perPage=env.userHistory.defaultPerPage;
 		load_history();
 	});
 
@@ -572,9 +572,9 @@ function load_history(){
 
 	$.post(base_url + "user/history", {
 		api_token:settings.user.api_token,
-		per_page:UserHistory.perPage,
-		page_num:UserHistory.pageNum,
-		search_term:UserHistory.searchTerm
+		per_page:userHistory.perPage,
+		page_num:userHistory.pageNum,
+		search_term:userHistory.searchTerm
 	}, function (response) {
 		$("#history_div").removeClass("loading");
 		if(!response.history || response.history.length==0){
@@ -602,8 +602,8 @@ function load_history(){
 		}
 
 		//now add the pagination parts
-		let pageNumOptions=`<option>${UserHistory.pageNum}</option>`,
-			perPageOptions=`<option>${UserHistory.perPage}</option>`;
+		let pageNumOptions=`<option>${userHistory.pageNum}</option>`,
+			perPageOptions=`<option>${userHistory.perPage}</option>`;
 
 		if(response.page_num!==undefined && response.num_pages!==undefined){
 			pageNumOptions="";
