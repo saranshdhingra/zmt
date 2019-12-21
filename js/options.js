@@ -2,6 +2,7 @@ var settings = {
 		'user': false,
 		'mail_tracking': false,
 		'show_notifications':false,
+		'dark_mode':false,
 		'timezone': 'GMT'
 	},
 	messaging,
@@ -202,6 +203,11 @@ jQuery(document).ready(function($){
 			settings.mail_tracking = true;
 		else
 			settings.mail_tracking = false;
+
+		if ($("#chk_dark_mode").prop("checked"))
+			settings.dark_mode = true;
+		else
+			settings.dark_mode = false;
 
 		//debug
 		if ($("#chk_debug").prop("checked"))
@@ -460,6 +466,14 @@ jQuery(document).ready(function($){
 			$("#email_views_search_btn").trigger("click");
 		}
 	});
+
+	//dark mode
+	$("#chk_dark_mode").on("change",function(){
+		if($(this).prop("checked"))
+			updateDarkModeStyle(true);
+		else
+			updateDarkModeStyle(false);
+	})
 });
 
 //updates the local storage with the current settings object
@@ -532,6 +546,15 @@ function refresh_settings(callback){
 		}
 		else{
 			$("#chk_show_notifs").prop("checked", false);
+		}
+
+		if(settings.dark_mode){
+			$("#chk_dark_mode").prop("checked",true);
+			//also load the dark theme stylesheet
+			updateDarkModeStyle(true);
+		}
+		else{
+			$("#chk_dark_mode").prop("checked", false);
 		}
 
 		if(settings.debug){
@@ -807,6 +830,22 @@ function showDeleteConfirmationDialog(emailHash,subject){
 
 	$("#modal_content").html(content).addClass("visible");
 	$("#modal").addClass(["visible","confirmation"]);
+}
+
+function updateDarkModeStyle(load){
+	if(load){
+		let script=document.createElement("link");
+		script.rel="stylesheet";
+		script.href="css/dark_mode.css";
+		script.id="dark_mode_script";
+		document.body.appendChild(script);
+	}
+	else{
+		let script=document.getElementById("dark_mode_script");
+		if(script!==null){
+			script.parentNode.removeChild(script);
+		}
+	}
 }
 
 function log() {

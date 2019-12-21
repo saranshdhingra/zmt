@@ -93,6 +93,36 @@ jQuery(document).ready(function($){
 		check_page_needs_reload();
 	},5000);
 
+	//ctrl + Enter capture
+	// $("body").on("keydown",".subject-field",function(e){
+	// 	e.preventDefault();
+	// 	e.stopImmediatePropagation();
+	// 	e.stopPropagation();
+	// 	console.log("keydown");
+	// 	console.log(e);
+	// 	if(e.ctrlKey && e.keyCode == 13){
+	// 		//find the mail which is focussed
+	// 		let sendBtn=$(".zmWorkSpace").find(".SCm").not(".zmHideD").find("[data-zmt_event='s']");
+
+	// 		// console.log(sendBtn);
+	// 	}
+
+	// 	return false;
+	// });
+
+	// $("body").on("keyup",function(e){
+	// 	e.preventDefault();
+	// 	e.stopImmediatePropagation();
+	// 	e.stopPropagation();
+	// 	console.log("keyup");
+	// 	if(e.ctrlKey && e.keyCode == 13){
+	// 		//find the mail which is focussed
+	// 		let sendBtn=$(".zmWorkSpace").find(".SCm").not(".zmHideD").find("[data-zmt_event='s']");
+
+	// 		console.log(sendBtn);
+	// 	}
+	// });
+
 });
 
 //the function that gets the settings from localstorage and then stores a local copy of it!

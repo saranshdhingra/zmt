@@ -1,0 +1,41 @@
+body{
+	background:#000;
+	color:#fff;
+}
+header{
+	background: #3c3c3c;
+    border-bottom: 1px solid #fff;
+}
+.menu a{
+	color:#fff;
+}
+.menu a:hover, .menu a.active{
+	color:#fff;
+	text-shadow:0 0 4px;
+}
+.select2-results__option{
+	color:#444;
+}
+fieldset{
+	border-color:#fff;
+}
+.search_row td{
+	background:#000;
+}
+table tbody td{
+	color:#b1b1b1;
+	background:#000;
+}
+table tbody tr:nth-child(odd) td{
+	background:#404040;
+}
+[class^='icon-']{
+	color:#b1b1b1;
+}
+[class^='icon-']:hover{
+	color:#fff;
+}
+footer{
+	background:#000;
+	border-top:1px solid #f1f1f1;
+}
