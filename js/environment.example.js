@@ -1,5 +1,6 @@
 const env = {
-	baseUrl: "https://zohomailtracker.com/api/v2/",
+	baseUrl: "https://zohomailtracker.com/api/v3/",
+	webLoginUrl: "https://zohomailtracker.com/web-login",
 	publicVapidKey: "",
 	pubnub: {
 		subscribeKey: ''
