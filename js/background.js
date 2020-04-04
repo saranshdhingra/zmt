@@ -107,7 +107,7 @@ chrome.webRequest.onBeforeRequest.addListener(function (info) {
 		};
 	}
 }, {
-	urls: ["*://zohomailtracker.com/api/v2/img/*"]
+	urls: ["*://zohomailtracker.com/api/v3/img/*"]
 }, ["blocking"]);
 
 //message passing receiver

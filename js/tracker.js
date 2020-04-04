@@ -2,7 +2,7 @@ var zmt_token,
 	doc_user_email,
 	imgs_url=chrome.extension.getURL('images/'),
 	needs_reload=false,
-	base_url = "https://zohomailtracker.com/api/v2/",
+	base_url = "https://zohomailtracker.com/api/v3/",
 	zmt_settings,
 	zmtLoaderPromise,
 	zmtReloadCheckHandle,
@@ -178,7 +178,7 @@ function replace_send_btn(el){
 	var send_btn = el.parents(".SC_mclst.zmCnew").find(".SCtxt[data-event='s']").length ? el.parents(".SC_mclst.zmCnew").find(".SCtxt[data-event='s']"):el.parents(".SC_mclst.zmCnew").find(".SCtxt[data-zmt_event='s']"),
 		parent = send_btn.parents(".SC_flt"),
 		sender = getEmailSender(send_btn),
-		tracking_str;
+		tracking_str='';
 	if (zmt_settings && zmt_settings.mail_tracking && zmt_settings.user && zmt_settings.user.verified &&  !window.needs_reload && sender==zmt_settings.user.email) {
 		tracking_str = `<ul class='zmt_tracking_status'><li><img src='${imgs_url}tracker_inserted.png' data-tooltip="Tracker will be inserted on 'Send'"></li></ul>`;
 		
@@ -190,7 +190,7 @@ function replace_send_btn(el){
 	//or if mail tracking is switched off,
 	//or if the user is not verified,
 	//then simply add a visual to show the user that we won't be tracking this mail
-	else{
+	else if(send_btn.attr("data-zmt_event")=="s"){
 		let failed_reason = "";
 		if (!zmt_settings)
 			failed_reason = "Could not load saved settings!";
@@ -215,9 +215,12 @@ function replace_send_btn(el){
 		send_btn.attr("data-event", "s").removeAttr("data-zmt_event");
 	}
 
-	//just to show the current info of tracking status!
-	parent.find(".zmt_tracking_status").remove();
+	//just to show the current info of tracking status,
+	//but only if the tracking_str string has some value
+	if(tracking_str.length>0){
+		parent.find(".zmt_tracking_status").remove();
 		parent.append(tracking_str);
+	}
 }
 
 function insert_tracker(send_btn){
@@ -274,7 +277,7 @@ function remove_current_pixels_from_mail(mail_body) {
 	var imgs = mail_body.contents().find('img').filter(function () {
 		var src = $(this).attr("src");
 		//src was sometimes undefined
-		if (typeof src != "undefined" && src.match(/https:\/\/zohomailtracker\.com\/api\/v2\/img\?hash=\w+/)){
+		if (typeof src != "undefined" && src.match(/https:\/\/zohomailtracker\.com\/api\/v3\/img\?hash=\w+/)){
 			$(this).remove();
 		}
 	});

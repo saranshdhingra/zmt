@@ -67,6 +67,9 @@ footer{
 #tab_contents .tab_content.active{
 	display:block;
 }
+#dashboardLink{
+	display:none;
+}
 .input{
 	margin:20px 0;
 	min-height:25px;

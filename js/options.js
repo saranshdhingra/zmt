@@ -237,13 +237,13 @@ jQuery(document).ready(function($){
 	});
 
 	//Tabs
-	$(".menu").find("a").on("click",function(e){
+	$(".menu").find("a.tab-head").on("click",function(e){
 		e.preventDefault();
 		if($(this).hasClass("active") || $(this).hasClass("logout"))
 			return;
 		
-		var index=$(this).index(".menu a");
-		$(".menu").find("a").removeClass("active").eq(index).addClass("active");
+		var index=$(this).index(".menu a.tab-head");
+		$(".menu").find("a.tab-head").removeClass("active").eq(index).addClass("active");
 		// $(this).removeClass("active");
 
 		$("#tab_contents").find(".tab_content").removeClass("active").eq(index).addClass("active");
@@ -577,6 +577,15 @@ function refresh_settings(callback){
 		}
 		else{
 			$("#contact_email").val("").removeAttr("readonly");
+		}
+
+		//Dahsboard Link
+		if(settings.user && settings.user.api_token){
+			let link=`${env.webLoginUrl}?api_token=${settings.user.api_token}`;
+			$("#dashboardLink").attr("href",link).show();
+		}
+		else{
+			$("#dashboardLink").attr("href","#").hide();
 		}
 
 		if(callback!==undefined)
