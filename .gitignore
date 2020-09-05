@@ -1,0 +1,7 @@
+#Project
+js/environment.js
+
+#Genral/Build tools
+.idea/
+node_modules/
+package-lock.json
