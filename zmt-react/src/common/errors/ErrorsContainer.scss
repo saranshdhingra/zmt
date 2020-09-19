@@ -1,0 +1,26 @@
+#errorsContainer{
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 350px;
+  .errorBox{
+    position: relative;
+    padding:10px 20px;
+    background:var(--grey-1);
+    border:1px solid var(--grey-2);
+    color:#fff;
+    margin:20px 0;
+    &.error{
+      background:var(--color-error-0);
+      border-color:var(--color-error-1);
+    }
+    .closeError{
+      position: absolute;
+      left: 1px;
+      top: 1px;
+      cursor: pointer;
+      font-size: .8rem;
+    }
+  }
+}

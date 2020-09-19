@@ -1,0 +1,23 @@
+@import '../../sass/mixins';
+
+.sidebarContainer{
+    height:100vh;
+    width:70px;
+    min-width:70px;
+    background:transparent;
+    border-radius:0 5px 5px 0;
+    padding:60px 0;
+    transition:all .4s ease-out;
+}
+.sidebarContainer.open{
+    width:25%;
+    min-width:250px;
+    background:var(--sidebar-grey);
+}
+.sidebarContainer .sidebarMenuList{
+    @include hidden;
+}
+.sidebarContainer.open .sidebarMenuList{
+    @include visible;
+}
+

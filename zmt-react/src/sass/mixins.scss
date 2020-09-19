@@ -1,0 +1,17 @@
+@mixin hidden{
+  opacity:0;
+  pointer-events:none;
+}
+@mixin visible{
+  opacity:1;
+  pointer-events: all;
+}
+@mixin disableOutline{
+  &:active,
+  &:focus{
+    outline:none;
+  }
+}
+@mixin allTransition{
+  transition:all .4s ease-out;
+}
