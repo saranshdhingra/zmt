@@ -30,13 +30,13 @@ class App extends Component{
 
     componentDidMount(){
         axios.defaults.baseURL = 'https://zohomailtracker.com/api/v3';
-        axios.defaults.headers['Content-Type'] ='application/x-www-form-urlencoded; charset=UTF-8';
 
         axios.interceptors.response.use((response) =>{
             const resCode=_.get(response,'data.code',undefined),
                 msg=_.get(response,'data.msg',DEFAULT_ERR_MSG);
             if(resCode!==1){
                 this.displayError(msg);
+                return Promise.reject(msg);
             }
 
             return response;

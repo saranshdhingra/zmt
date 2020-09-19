@@ -6,10 +6,10 @@ class CurrentUserEmail extends React.Component {
     constructor(props) {
         super(props);
         this.store=UserStore;
-    }
-    state={
-        currentEmail:this.store.user.email,
-        emailChangeInitiated:false
+        this.state={
+            currentEmail:this.store.user.email,
+            emailChangeInitiated:false
+        };
     }
 
     getContainerClasses(){

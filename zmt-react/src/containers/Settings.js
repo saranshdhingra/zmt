@@ -14,14 +14,14 @@ class Settings extends Component{
     }
 
     getLeftSection(){
-        return this.store.user.email!==undefined ? (
+        return this.store.user.verified ? (
             <div className={'settingsSection settingsLeft col-4 p-4'}>
                 Settings
             </div>
         ) : null;
     }
     getEmailRow(){
-        if(this.store.user.email===undefined || !this.store.user.verified){
+        if(!this.store.user.verified){
             return (
                 <LoginComponent />
             );

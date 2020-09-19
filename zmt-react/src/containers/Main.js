@@ -1,4 +1,4 @@
-import {Settings} from "./Settings";
+import Settings from "./Settings";
 import React, {Component} from "react";
 import Header from "../common/Header";
 import './Main.css';
