@@ -8,11 +8,15 @@ class UserStore{
         };
     }
     @observable user;
-    @observable a;
 
     @action
     setUserEmail(email){
         this.user.email=email;
+    }
+
+    @action
+    setUserVerified(status){
+        this.user.verified=status;
     }
 }
 export default new UserStore();
