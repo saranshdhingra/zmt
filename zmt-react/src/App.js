@@ -4,13 +4,20 @@ import Sidebar from "./common/sidebar/Sidebar";
 import axios from 'axios';
 import _ from 'lodash';
 import ErrorContainer from "./common/errors/ErrorContainer";
+import AppLoader from "./components/AppLoader";
 
 const DEFAULT_ERR_MSG='There was an error with the request, please try again!';
 
 class App extends Component{
     state={
-        errors:[]
+        errors:[],
+        loading:true
     }
+
+    setLoadingState(status){
+        this.setState({loading:status});
+    }
+
     displayError(msg){
         this.setState(prevState=>{
            return {
@@ -46,6 +53,13 @@ class App extends Component{
         });
     }
     render() {
+        if(this.state.loading){
+            return (
+                <AppLoader onLoaded={()=>{this.setLoadingState(false);}}/>
+
+            );
+        }
+
         return (
             <div className="App d-flex">
                 <Sidebar/>
