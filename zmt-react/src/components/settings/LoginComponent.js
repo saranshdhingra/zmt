@@ -53,7 +53,7 @@ class LoginComponent extends React.Component {
             await this.authService.login(this.state.currentEmail);
         }
         finally{
-            this.setState({loggingIn:false});
+            this.setState({loggingIn:false,changeRequested:false});
         }
     }
 

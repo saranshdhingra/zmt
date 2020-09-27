@@ -4,7 +4,10 @@ class UserStore{
     constructor(){
         this.user={
             email:undefined,
-            verified:false
+            verified:false,
+            apiToken:'',
+            channel:'',
+            timezone:''
         };
     }
     @observable user;
@@ -18,5 +21,21 @@ class UserStore{
     setUserVerified(status){
         this.user.verified=status;
     }
+
+    @action
+    setUserApiToken(token){
+        this.user.apiToken=token;
+    }
+
+    @action
+    setChannel(channelName){
+        this.user.channel=channelName;
+    }
+
+    @action
+    setTimezone(timezone){
+        this.user.timezone=timezone;
+    }
+
 }
 export default new UserStore();
