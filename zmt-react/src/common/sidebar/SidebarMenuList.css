@@ -1,10 +1,9 @@
 .sidebarMenuList{
     list-style:none;
     margin-top:40px;
-    color:#fff;
 }
 .sidebarMenuList li{
-    padding:10px 20px;
+    padding:10px var(--padding-x);
     transition:background-color .4s ease-out;
 }
 .sidebarMenuList li:hover{

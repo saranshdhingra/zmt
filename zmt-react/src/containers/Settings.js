@@ -1,6 +1,5 @@
 import React, {Component} from "react";
 import LoginComponent from "../components/settings/LoginComponent";
-import CurrentUserEmail from "../components/settings/CurrentUserEmail";
 import './Settings.css';
 import UserStore from "../stores/UserStore";
 import {observer} from "mobx-react";
@@ -20,26 +19,12 @@ class Settings extends Component{
             </div>
         ) : null;
     }
-    getEmailRow(){
-        if(!this.store.user.verified){
-            return (
-                <LoginComponent />
-            );
-        }
-        else{
-            return (
-                <CurrentUserEmail />
-            )
-        }
-    }
+
     render() {
         return (
             <div className='col-12 tabContent'>
                 <div className={'row justify-content-between'}>
                     {this.getLeftSection()}
-                    <div className={'settingsSection settingsRight col-4 p-4'}>
-                        {this.getEmailRow()}
-                    </div>
                 </div>
             </div>
         );

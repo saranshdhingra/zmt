@@ -8,6 +8,8 @@
     border-radius:0 5px 5px 0;
     padding:60px 0;
     transition:all .4s ease-out;
+    --padding-x:20px;
+    color:var(--text-color-primary-inverted);
 }
 .sidebarContainer.open{
     width:25%;
@@ -19,5 +21,8 @@
 }
 .sidebarContainer.open .sidebarMenuList{
     @include visible;
+}
+.sidebarWelcome{
+    padding:10px var(--padding-x);
 }
 

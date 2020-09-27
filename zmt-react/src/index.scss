@@ -1,4 +1,6 @@
 :root{
+  --text-color-primary:#212529;
+  --text-color-primary-inverted:#fff;
   --color-primary:#9068be;
   --color-secondary:#6ed3cf;
   --color-black-op-0-5:rgba(0,0,0,0.5);
@@ -11,6 +13,7 @@
 }
 body{
   background:#efefef;
+  color:var(--text-color-primary);
 }
 a,a:hover{
   text-decoration: none;
