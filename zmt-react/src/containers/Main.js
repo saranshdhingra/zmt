@@ -4,6 +4,7 @@ import Header from "../common/Header";
 import './Main.css';
 import UserStore from "../stores/UserStore";
 import { observer } from "mobx-react";
+import LoginComponent from "../components/settings/LoginComponent";
 
 @observer
 class Main extends Component{
@@ -11,12 +12,23 @@ class Main extends Component{
         super(props);
         this.store=UserStore;
     }
+
+    getMainComponent(){
+        if(this.store.user.verified){
+            return (
+                <Settings user={this.store.user}/>
+            );
+        }
+        else{
+            return <LoginComponent />
+        }
+    }
     render(){
         return (
             <div id='main'>
                 <div className={'row'}>
                     <Header />
-                    <Settings user={this.store.user}/>
+                    {this.getMainComponent()}
                 </div>
             </div>
         );

@@ -23,6 +23,9 @@
     @include visible;
 }
 .sidebarWelcome{
+    @include hidden;
     padding:10px var(--padding-x);
 }
-
+.sidebarContainer.open .sidebarWelcome{
+    @include visible;
+}

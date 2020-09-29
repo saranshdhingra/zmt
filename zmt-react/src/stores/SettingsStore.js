@@ -2,34 +2,33 @@ import { observable, action } from 'mobx';
 
 class SettingsStore {
     constructor () {
-        this.tracking = false;
-        this.notifications = false;
-        this.debug = false;
-        this.timezone = 'GMT';
+        this.settings = {
+            tracking: false,
+            notifications: false,
+            debug: false,
+            timezone: 'GMT'
+        };
     }
-    @observable tracking;
-    @observable notifications;
-    @observable debug;
-    @observable timezone;
+    @observable settings;
 
     @action
     setTracking (status) {
-        this.tracking = status;
+        this.settings.tracking = status;
     }
 
     @action
     setNotifications (status) {
-        this.notifications = status;
+        this.settings.notifications = status;
     }
 
     @action
     setDebug (status) {
-        this.debug = status;
+        this.settings.debug = status;
     }
 
     @action
     setTimezone (timezone) {
-        this.timezone = timezone;
+        this.settings.timezone = timezone;
     }
 
     setSettings (data) {

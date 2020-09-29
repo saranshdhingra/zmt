@@ -1,3 +1,6 @@
 .settingsSection{
     margin:0 40px;
 }
+.settingsBlock .dropdown{
+    min-width:200px;
+}
