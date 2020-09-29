@@ -1,6 +1,17 @@
-.settingsSection{
-    margin:0 40px;
+.settingsSection {
+    margin: 0 40px;
 }
-.settingsBlock .dropdown{
-    min-width:200px;
+
+.settingsBox {
+    background: var(--bg-color-inverted);
+    padding: 40px 20px;
+    border-radius: 8px;
+}
+
+.settingsBlock {
+    margin: 20px 0;
+}
+
+.settingsBlock .dropdown {
+    min-width: 200px;
 }

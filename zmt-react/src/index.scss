@@ -1,6 +1,8 @@
 :root{
   --text-color-primary:#212529;
   --text-color-primary-inverted:#fff;
+  --bg-color-primary:#efefef;
+  --bg-color-inverted:#fff;
   --color-primary:#9068be;
   --color-secondary:#6ed3cf;
   --color-black-op-0-5:rgba(0,0,0,0.5);
@@ -12,7 +14,7 @@
   --sidebar-grey:rgb(63 63 63);
 }
 body{
-  background:#efefef;
+  background:var(--bg-color-primary);
   color:var(--text-color-primary);
 }
 a,a:hover{
@@ -20,4 +22,7 @@ a,a:hover{
 }
 a,a:visited{
   color:inherit;
+}
+label{
+  margin-bottom: 0;
 }

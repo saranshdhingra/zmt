@@ -42,6 +42,47 @@ class Settings extends Component {
         });
     }
 
+    getSettings () {
+        const settings = [
+            {
+                label: 'Tracking',
+                value: this.settingsStore.settings.tracking,
+                changed: this.trackingChanged.bind(this)
+            },
+            {
+                label: 'Show Notifications',
+                value: this.settingsStore.settings.notifications,
+                changed: this.notificationsChanged.bind(this)
+            },
+            {
+                label: 'Debug Messages in Console',
+                value: this.settingsStore.settings.debug,
+                changed: this.debugChanged.bind(this)
+            },
+            {
+                label: 'Timezone',
+                value: this.settingsStore.settings.timezone,
+                changed: this.timezoneChanged.bind(this),
+                type: 'dropdown',
+                options: this.getTimezones(),
+                classes: ['align-items-center']
+            }
+        ];
+
+        return settings.map((setting, index) => {
+            let props = {
+                key: index,
+                label: setting.label,
+                type: setting.type || undefined,
+                classes: setting.classes || undefined,
+                options: setting.options || undefined,
+                value: setting.value,
+                changed: setting.changed
+            };
+            return (<SettingsBlock {...props} />);
+        });
+    }
+
     render () {
         return (
             <div className='col-12 tabContent'>
@@ -49,10 +90,7 @@ class Settings extends Component {
                     <div className={'settingsSection settingsLeft col-4 p-4'}>
                         <h3>Settings</h3>
                         <div className='settingsBox'>
-                            <SettingsBlock label='Tracking' value={this.settingsStore.settings.tracking} changed={this.trackingChanged.bind(this)} />
-                            <SettingsBlock label='Show Notifications' value={this.settingsStore.settings.notifications} changed={this.notificationsChanged.bind(this)} />
-                            <SettingsBlock label='Show Debug Messages in Console' value={this.settingsStore.settings.debug} changed={this.debugChanged.bind(this)} />
-                            <SettingsBlock label='Timezone' type='dropdown' options={this.getTimezones()} value={this.settingsStore.settings.timezone} changed={this.timezoneChanged.bind(this)} />
+                            {this.getSettings()}
                         </div>
                     </div>
                 </div>
