@@ -1,40 +1,28 @@
 import React from 'react';
 import './AppLoader.css';
-import UserStore from "../stores/UserStore";
+import UserStore from '../stores/UserStore';
+import SettingsStore from '../stores/SettingsStore';
 import config from '../config/env';
+import StorageService from '../services/StorageService';
 
 class AppLoader extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {};
     }
 
-    //fetches persistent data from localstorage
-    fetchSavedData(){
-        const data={
-            user:{
-                email:config.TEST_EMAIL,
-                verified:true,
-                apiToken:config.TEST_API_KEY,
-                channel:config.TEST_CHANNEL,
-                timezone:'Asia/Kolkata',
-            }
-        };
-        setTimeout(()=>{
-            UserStore.setUserEmail(data.user.email);
-            UserStore.setUserVerified(data.user.verified);
-            UserStore.setUserApiToken(data.user.apiToken);
-            UserStore.setChannel(data.user.channel);
-            UserStore.setTimezone(data.user.timezone);
-            this.props.onLoaded();
-        },3000);
+    // fetches persistent data from localstorage
+    async fetchSavedData () {
+        UserStore.setUserDetails(await StorageService.get('user'));
+        SettingsStore.setSettings(await StorageService.get('settings'));
+        this.props.onLoaded();
     }
 
-    componentDidMount() {
+    componentDidMount () {
         this.fetchSavedData();
     }
 
-    render() {
+    render () {
         return (
             <div id='appLoader'>
                 Loading...
