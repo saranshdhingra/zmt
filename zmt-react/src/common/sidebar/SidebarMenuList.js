@@ -2,12 +2,15 @@ import React, { Component } from 'react';
 import './SidebarMenuList.css';
 import UserStore from '../../stores/UserStore';
 import StorageService from '../../services/StorageService';
+import UiStore from '../../stores/UiStore';
 
 export default class SidebarMenuList extends Component {
     constructor (props) {
         super(props);
         this.userStore = UserStore;
+        this.uiStore = UiStore;
         this.logoutHandler = this.logoutHandler.bind(this);
+        this.changePage = this.changePage.bind(this);
     }
     getClasses () {
         return this.props.openStatus ? 'sidebarMenuList sidebarOpen' : 'sidebarMenuList';
@@ -19,19 +22,29 @@ export default class SidebarMenuList extends Component {
         this.userStore.logoutUser();
     }
 
+    changePage (e) {
+        e.preventDefault();
+        const page = e.target.getAttribute('data-key');
+
+        this.uiStore.setOpenPage(page);
+    }
+
     getListItems () {
         const items = [
             {
                 text: 'Settings',
-                link: 'settings'
+                link: 'settings',
+                click: this.changePage
             },
             {
                 text: 'FAQ',
-                link: 'faq'
+                link: 'faq',
+                click: this.changePage
             },
             {
                 text: 'Contact',
-                link: 'contact'
+                link: 'contact',
+                click: this.changePage
             },
             {
                 text: 'Logout',
@@ -46,7 +59,7 @@ export default class SidebarMenuList extends Component {
                       className='sidebarMenuItem'
                       key={index}
                     >
-                        <a href={item.link} onClick={item.click ? item.click : undefined}>{item.text}</a>
+                        <a href={item.link} onClick={item.click ? item.click : undefined} data-key={item.link}>{item.text}</a>
                     </li>
             );
         });
