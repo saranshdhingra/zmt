@@ -1,0 +1,51 @@
+.faqItem {
+
+  width: 800px;
+
+  .faqHead {
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    cursor: pointer;
+
+    .arrow {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #000;
+
+      &:after {
+        content: '';
+        display: block;
+        width: 8px;
+        height: 8px;
+        border-bottom: 1px solid #fff;
+        border-right: 1px solid #fff;
+        transform: rotate(45deg);
+        transition: all .4s ease-out;
+      }
+    }
+  }
+
+  .faqText {
+    padding: 0 10px;
+    background: #e6e6e6;
+    margin-bottom: 10px;
+    max-height: 0;
+    overflow: hidden;
+    //Pure CSS slide toggle behaviour
+    transition: max-height .4s ease-out, padding .4s ease-out;
+  }
+
+  &.open {
+    .faqHead .arrow:after {
+      transform: rotate(-135deg);
+    }
+
+    .faqText {
+      //sufficiently large to have all our FAQs supported
+      max-height: 500px;
+      padding: 10px;
+    }
+  }
+
+}

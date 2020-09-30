@@ -1,29 +1,39 @@
-import Settings from "./Settings";
-import React, {Component} from "react";
-import Header from "../common/Header";
+import Settings from './Settings';
+import React, { Component } from 'react';
+import Header from '../common/Header';
 import './Main.css';
-import UserStore from "../stores/UserStore";
-import { observer } from "mobx-react";
-import LoginComponent from "../components/settings/LoginComponent";
+import UserStore from '../stores/UserStore';
+import { observer } from 'mobx-react';
+import LoginComponent from '../components/settings/LoginComponent';
+import UiStore from '../stores/UiStore';
+import Faq from './Faq';
 
 @observer
-class Main extends Component{
-    constructor(props) {
+class Main extends Component {
+    constructor (props) {
         super(props);
-        this.store=UserStore;
+        this.userStore = UserStore;
+        this.uiStore = UiStore;
     }
 
-    getMainComponent(){
-        if(this.store.user.verified){
-            return (
-                <Settings user={this.store.user}/>
-            );
+    getMainComponent () {
+        if (this.userStore.user.verified) {
+            switch (this.uiStore.openPage) {
+                case 'settings':
+                    return <Settings user={this.userStore.user} />;
+                case 'faq':
+                    return <Faq />;
+                case 'contact':
+                    return 'Contact';
+                default:
+                    return '404';
+            }
         }
-        else{
-            return <LoginComponent />
+        else {
+            return <LoginComponent />;
         }
     }
-    render(){
+    render () {
         return (
             <div id='main'>
                 <div className={'row'}>
