@@ -1,14 +1,15 @@
-import React, {Component} from 'react';
-import SidebarMenuList from "./SidebarMenuList";
+import React, { Component } from 'react';
+import SidebarMenuList from './SidebarMenuList';
 import './SidebarContainer.scss';
-import SidebarBtn from "./SidebarBtn";
-import UserStore from "../../stores/UserStore";
-// import Aux from "../general/Aux";
+import SidebarBtn from './SidebarBtn';
+import UserStore from '../../stores/UserStore';
+import { observer } from 'mobx-react';
 
-export default class SidebarContainer extends Component {
-    constructor(props) {
+@observer
+class SidebarContainer extends Component {
+    constructor (props) {
         super(props);
-        this.store=UserStore;
+        this.store = UserStore;
     }
 
     getClasses () {
@@ -27,3 +28,5 @@ export default class SidebarContainer extends Component {
         );
     }
 }
+
+export default SidebarContainer;

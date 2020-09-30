@@ -1,14 +1,18 @@
 import { observable, action } from 'mobx';
 
+function getDefaultUserObj () {
+    return {
+        email: undefined,
+        verified: false,
+        apiToken: '',
+        channel: '',
+        timezone: ''
+    };
+}
+
 class UserStore {
     constructor () {
-        this.user = {
-            email: undefined,
-            verified: false,
-            apiToken: '',
-            channel: '',
-            timezone: ''
-        };
+        this.user = getDefaultUserObj();
     }
     @observable user;
 
@@ -35,6 +39,11 @@ class UserStore {
     @action
     setTimezone (timezone) {
         this.user.timezone = timezone;
+    }
+
+    @action
+    logoutUser () {
+        this.user = getDefaultUserObj();
     }
 
     setUserDetails (data) {
