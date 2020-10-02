@@ -3,6 +3,7 @@
   --text-color-primary-inverted:#fff;
   --bg-color-primary:#efefef;
   --bg-color-inverted:#fff;
+  --btn-color-primary:#9068be;
   --color-primary:#9068be;
   --color-secondary:#6ed3cf;
   --color-black-op-0-5:rgba(0,0,0,0.5);
@@ -31,4 +32,17 @@ code{
   background: #e0dddd;
   padding: 2px 4px;
   border-radius: 4px;
+}
+button.btn-color-primary,
+button.btn-color-primary:hover,
+button.btn-color-primary:active,
+button.btn-color-primary:focus{
+    background-color: var(--btn-color-primary);
+    border: none;
+    box-shadow: none;
+    color:#fff;
+}
+button.btn-color-primary:disabled{
+  background-color: var(--btn-color-primary);
+  cursor: not-allowed;
 }

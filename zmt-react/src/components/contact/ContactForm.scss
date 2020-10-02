@@ -1,0 +1,23 @@
+.contactForm {
+  --label-min-width:350px;
+
+  .form-group > label {
+    min-width: var(--label-min-width);
+  }
+
+  .radioGroup .radioBtn {
+    margin: 0 20px 0 0;
+  }
+
+  .form-control{
+    max-width:500px;
+
+    &.textarea{
+      min-height:100px;
+    }
+  }
+
+  .btnRow{
+    padding-left:var(--label-min-width);
+  }
+}

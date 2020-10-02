@@ -2,7 +2,7 @@ import { observable, action } from 'mobx';
 
 class UiStore {
     constructor () {
-        this.openPage = 'faq';
+        this.openPage = 'contact';
     }
     @observable openPage;
 

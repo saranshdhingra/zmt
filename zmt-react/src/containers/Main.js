@@ -7,6 +7,7 @@ import { observer } from 'mobx-react';
 import LoginComponent from '../components/settings/LoginComponent';
 import UiStore from '../stores/UiStore';
 import Faq from './Faq';
+import Contact from './Contact';
 
 @observer
 class Main extends Component {
@@ -24,7 +25,7 @@ class Main extends Component {
                 case 'faq':
                     return <Faq />;
                 case 'contact':
-                    return 'Contact';
+                    return <Contact />;
                 default:
                     return '404';
             }

@@ -1,26 +1,26 @@
-import axios from "axios";
-import UserStore from "../stores/UserStore";
+import axios from 'axios';
+import UserStore from '../stores/UserStore';
 
-class AuthService{
-    constructor() {
-        this.store=UserStore;
+class AuthService {
+    constructor () {
+        this.store = UserStore;
     }
-    async login(email){
+    async login (email) {
         await axios.post('/user/login',
             {
-                email:email
+                email: email
             }
         );
         this.store.setUserEmail(email);
     }
-    async verify(email,otp){
+    async verify (email, otp) {
         const response = await axios.post('/user/verify',
             {
-                email:email,
-                otp:otp
+                email: email,
+                otp: otp
             }
         );
-        const data=response.data;
+        const data = response.data;
         console.log(data);
         this.store.setUserEmail(email);
         this.store.setUserVerified(true);
