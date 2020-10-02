@@ -2,13 +2,16 @@ import React from 'react';
 import './ContactForm.scss';
 import RadioBtnGroup from '../../common/radio-button/RadioBtnGroup';
 import ContactService from '../../services/ContactService';
-import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationTriangle, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { validate } from 'validate.js';
 import Swal from 'sweetalert2';
+import { observer } from 'mobx-react';
+import UserStore from '../../stores/UserStore';
 
 const DEFAULT_MSG_TYPE = 'Feedback';
 
+@observer
 class ContactForm extends React.Component {
     constructor (props) {
         super(props);
@@ -24,6 +27,10 @@ class ContactForm extends React.Component {
 
         this.typeChanged = this.typeChanged.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
+    }
+
+    getInitialEmail () {
+        return UserStore.user.verified ? UserStore.user.email : '';
     }
 
     getMessageTypes () {
@@ -152,6 +159,8 @@ class ContactForm extends React.Component {
                           id={'contactEmail'}
                           placeholder={'Your email'}
                           ref={this.emailRef}
+                          defaultValue={this.getInitialEmail()}
+                          disabled={!!this.getInitialEmail().length}
                         />
                     </div>
                     {
@@ -181,7 +190,10 @@ class ContactForm extends React.Component {
                     }
                 </div>
                 <div className={'form-group btnRow'}>
-                    <button className={'btn btn-color-primary'} onClick={this.formSubmit} disabled={this.state.sendingReq}>Submit</button>
+                    <button className={'btn btn-color-primary'} onClick={this.formSubmit} disabled={this.state.sendingReq}>
+                        <FontAwesomeIcon icon={faPaperPlane} />
+                        Submit
+                    </button>
                 </div>
             </div>
         );

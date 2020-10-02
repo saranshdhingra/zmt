@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './Settings.css';
+import './Settings.scss';
 import UserStore from '../stores/UserStore';
 import SettingsStore from '../stores/SettingsStore';
 import { observer } from 'mobx-react';
@@ -87,7 +87,7 @@ class Settings extends Component {
         return (
             <div className='col-12 tabContent'>
                 <div className={'row justify-content-between'}>
-                    <div className={'settingsSection settingsLeft col-4 p-4'}>
+                    <div className={'settingsSection settingsLeft col-12 p-4'}>
                         <h3>Settings</h3>
                         <div className='settingsBox'>
                             {this.getSettings()}

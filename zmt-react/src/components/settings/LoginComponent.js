@@ -5,6 +5,8 @@ import AuthService from '../../services/AuthService';
 import './LoginComponent.scss';
 import { getClassesFromObj } from '../../utils/common';
 import StorageService from '../../services/StorageService';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle, faSignInAlt, faSync, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 @observer
 class LoginComponent extends React.Component {
@@ -76,22 +78,23 @@ class LoginComponent extends React.Component {
     getLoginBtn () {
         if (!this.store.user.email || this.state.changeRequested) {
             return (
-                <>
-                    <button
-                      disabled={this.state.loggingIn ? true : null}
-                      onClick={this.login.bind(this)}
-                      className='btn btn-primary'
-                    >Login</button>
-                    {
-                    }
-                </>
+                <button
+                  disabled={this.state.loggingIn ? true : null}
+                  onClick={this.login.bind(this)}
+                  className='btn btn-color-primary'
+                >
+                    <FontAwesomeIcon icon={faSignInAlt} />
+                    Login
+                </button>
             );
         }
         else {
-             return (<button
-               onClick={this.inititateChange.bind(this)}
-               className='btn btn-primary'
-                     >
+             return (
+                    <button
+                      onClick={this.inititateChange.bind(this)}
+                      className='btn btn-color-primary'
+                    >
+                        <FontAwesomeIcon icon={faSync} />
                         Change
                      </button>);
         }
@@ -115,8 +118,9 @@ class LoginComponent extends React.Component {
                     <button
                       disabled={this.state.verifying ? true : null}
                       onClick={this.verify.bind(this)}
-                      className='btn btn-primary'
+                      className='btn btn-color-primary'
                     >
+                        <FontAwesomeIcon icon={faCheckCircle} />
                         Verify
                     </button>
                </div>
@@ -144,7 +148,7 @@ class LoginComponent extends React.Component {
                           disabled={this.store.user.email && !this.state.changeRequested}
                         />
                         <a onClick={this.cancelChange.bind(this)} className='cancelBtn'>
-                            X
+                            <FontAwesomeIcon icon={faTimes} />
                         </a>
                     </div>
                     {this.getLoginBtn()}

@@ -1,17 +1,23 @@
 @import "../../sass/mixins";
 
-.loginComponent input.form-control{
-    margin-bottom:10px;
-}
-.loginComponent .emailWrapper{
-    position:relative;
-}
-.loginComponent .emailWrapper .cancelBtn{
-    display: none;
-    color:var(--color-error-0);
-    cursor: pointer;
-    @include right-positioned-center(10px);
-}
-.loginComponent .emailWrapper.changing .cancelBtn{
-    display:block;
+.loginComponent{
+
+    input.form-control{
+        margin-bottom:10px;
+    }
+
+    .emailWrapper{
+        position:relative;
+
+        .cancelBtn{
+            display: none;
+            color:var(--color-error-0);
+            cursor: pointer;
+            @include right-positioned-center(10px);
+        }
+
+        &.changing .cancelBtn{
+            display:block;
+        }
+    }
 }

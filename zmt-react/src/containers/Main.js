@@ -18,20 +18,18 @@ class Main extends Component {
     }
 
     getMainComponent () {
-        if (this.userStore.user.verified) {
-            switch (this.uiStore.openPage) {
-                case 'settings':
+        switch (this.uiStore.openPage) {
+            case 'settings':
+                if (this.userStore.user.verified)
                     return <Settings user={this.userStore.user} />;
-                case 'faq':
-                    return <Faq />;
-                case 'contact':
-                    return <Contact />;
-                default:
-                    return '404';
-            }
-        }
-        else {
-            return <LoginComponent />;
+                else
+                    return <LoginComponent />;
+            case 'faq':
+                return <Faq />;
+            case 'contact':
+                return <Contact />;
+            default:
+                return '404';
         }
     }
     render () {

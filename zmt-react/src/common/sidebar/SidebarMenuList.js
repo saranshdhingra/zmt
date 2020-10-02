@@ -40,32 +40,37 @@ class SidebarMenuList extends Component {
             {
                 text: 'Dashboard',
                 link: this.getDashboardLink(),
-                external: true
+                external: true,
+                visible: this.userStore.user.verified
             },
             {
                 text: 'Settings',
                 link: 'settings',
-                click: this.changePage
+                click: this.changePage,
+                visible: true
             },
             {
                 text: 'FAQ',
                 link: 'faq',
-                click: this.changePage
+                click: this.changePage,
+                visible: true
             },
             {
                 text: 'Contact',
                 link: 'contact',
-                click: this.changePage
+                click: this.changePage,
+                visible: true
             },
             {
                 text: 'Logout',
                 link: 'logout',
-                click: this.logoutHandler
+                click: this.logoutHandler,
+                visible: this.userStore.user.verified
             }
         ];
 
         return items.map((item, index) => {
-            return (
+            return item.visible ? (
                     <li
                       className={`sidebarMenuItem ${item.link === UiStore.openPage ? 'selected' : ''}`}
                       key={index}
@@ -79,7 +84,7 @@ class SidebarMenuList extends Component {
                             {item.text}
                         </a>
                     </li>
-            );
+            ) : null;
         });
     }
 

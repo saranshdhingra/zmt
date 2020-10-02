@@ -12,17 +12,18 @@
       height: 20px;
       border-radius: 50%;
       background: #000;
-
-      &:after {
-        content: '';
-        display: block;
-        width: 8px;
-        height: 8px;
-        border-bottom: 1px solid #fff;
-        border-right: 1px solid #fff;
-        transform: rotate(45deg);
-        transition: all .4s ease-out;
-      }
+      color:#fff;
+      //
+      //&:after {
+      //  content: '';
+      //  display: block;
+      //  width: 8px;
+      //  height: 8px;
+      //  border-bottom: 1px solid #fff;
+      //  border-right: 1px solid #fff;
+      //  transform: rotate(45deg);
+      //  transition: all .4s ease-out;
+      //}
     }
   }
 
@@ -37,13 +38,13 @@
   }
 
   &.open {
-    .faqHead .arrow:after {
-      transform: rotate(-135deg);
+    .faqHead .arrow>svg {
+      transform: rotate(-180deg);
     }
 
     .faqText {
-      //sufficiently large to have all our FAQs supported
-      max-height: 500px;
+      // should be sufficiently large to have all our FAQs supported
+      max-height: 200px;
       padding: 10px;
     }
   }

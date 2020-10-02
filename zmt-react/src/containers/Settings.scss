@@ -1,0 +1,27 @@
+.settingsSection {
+	margin: 0 40px;
+	max-width: 450px;
+
+	h3 {
+		color: var(--color-primary);
+		font-size: 3rem;
+	}
+}
+
+.settingsBox {
+	background: var(--bg-color-inverted);
+	padding: 40px 20px;
+	border-radius: 8px;
+}
+
+.settingsBlock {
+	margin: 20px 0;
+
+	label {
+		display: block;
+	}
+}
+
+.settingsBlock .dropdown {
+	min-width: 200px;
+}
