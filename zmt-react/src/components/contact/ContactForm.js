@@ -65,6 +65,12 @@ class ContactForm extends React.Component {
         };
     }
 
+    clearInputs () {
+        this.nameRef.current.value = '';
+        this.emailRef.current.value = '';
+        this.msgRef.current.value = '';
+    }
+
     validateForm () {
         const rules = {
             name: {
@@ -109,6 +115,7 @@ class ContactForm extends React.Component {
             this.setState({ sendingReq: true });
             const response = await ContactService.sendContactRequest(data);
             await Swal.fire('Success', response.msg, 'success');
+            this.clearInputs();
         }
         catch (err) {
             console.log(err);
