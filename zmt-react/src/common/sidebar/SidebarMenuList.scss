@@ -1,0 +1,19 @@
+.sidebarMenuList {
+  list-style: none;
+  margin-top: 40px;
+}
+
+.sidebarMenuList li {
+  padding: 10px var(--padding-x);
+  transition: background-color .4s ease-out;
+
+  &:hover,
+  &.selected{
+    background-color: var(--color-primary);
+  }
+
+  a {
+    font-size: 1.2rem;
+  }
+
+}

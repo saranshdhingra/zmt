@@ -1,7 +1,9 @@
 #Project
 js/environment.js
+zmt-react/src/config/env.js
 
 #Genral/Build tools
 .idea/
 node_modules/
 package-lock.json
+.DS_Store

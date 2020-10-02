@@ -1,0 +1,26 @@
+.sidebarBtnContainer{
+    text-align: right;
+    margin: 10px 0;
+    padding: 0 20px;
+    width:70px;
+    min-width:70px;
+    position: absolute;
+    left: 0;
+    top: 20px;
+    transition:all .4s ease-out;
+}
+.sidebarBtnContainer.open{
+    width: 25%;
+    min-width: 250px;
+}
+.sidebarBtn{
+    display: inline-flex;
+    flex-wrap: wrap;
+    width: 24px;
+    justify-content: space-around;
+    cursor: pointer;
+    transition:transform .4s ease-out;
+}
+.sidebarBtnContainer:not(.open) .sidebarBtn{
+    transform:rotate(180deg);
+}

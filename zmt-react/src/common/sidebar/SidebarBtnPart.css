@@ -1,0 +1,21 @@
+.btnPart{
+    display: inline-block;
+    width:10px;
+    height:10px;
+    margin:1px;
+}
+.type-1{
+    background-color:#000;
+}
+.sidebarBtnContainer.open .type-1{
+    background-color: #fff;
+    border-radius:50%;
+}
+.type-2{
+    background-color:var(--color-secondary);
+    border-radius:50%;
+}
+.sidebarBtnContainer.open .type-2{
+    border-radius:0;
+    background-color:var(--color-primary);
+}
