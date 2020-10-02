@@ -4,6 +4,8 @@ import './SidebarContainer.scss';
 import SidebarBtn from './SidebarBtn';
 import UserStore from '../../stores/UserStore';
 import { observer } from 'mobx-react';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 @observer
 class SidebarContainer extends Component {
@@ -21,7 +23,12 @@ class SidebarContainer extends Component {
             <div className={this.getClasses()}>
                 <SidebarBtn click={this.props.toggleSidebar} openStatus={this.props.openStatus} />
                 {
-                    this.store.user.verified && (<div className='sidebarWelcome'>Hey, {this.store.user.email}</div>)
+                    this.store.user.verified && (
+                        <div className='sidebarWelcome'>
+                            <FontAwesomeIcon icon={faUser} className={'icon'} />
+                            Hey, {this.store.user.email}
+                        </div>
+                    )
                 }
                 <SidebarMenuList openStatus={this.props.openStatus} />
             </div>

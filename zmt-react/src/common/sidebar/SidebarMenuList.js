@@ -4,6 +4,8 @@ import UserStore from '../../stores/UserStore';
 import StorageService from '../../services/StorageService';
 import UiStore from '../../stores/UiStore';
 import { observer } from 'mobx-react';
+import { faChartLine, faCog, faEnvelopeOpen, faQuestionCircle, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 @observer
 class SidebarMenuList extends Component {
@@ -41,30 +43,35 @@ class SidebarMenuList extends Component {
                 text: 'Dashboard',
                 link: this.getDashboardLink(),
                 external: true,
+                icon: faChartLine,
                 visible: this.userStore.user.verified
             },
             {
                 text: 'Settings',
                 link: 'settings',
                 click: this.changePage,
+                icon: faCog,
                 visible: true
             },
             {
                 text: 'FAQ',
                 link: 'faq',
                 click: this.changePage,
+                icon: faQuestionCircle,
                 visible: true
             },
             {
                 text: 'Contact',
                 link: 'contact',
                 click: this.changePage,
+                icon: faEnvelopeOpen,
                 visible: true
             },
             {
                 text: 'Logout',
                 link: 'logout',
                 click: this.logoutHandler,
+                icon: faSignOutAlt,
                 visible: this.userStore.user.verified
             }
         ];
@@ -81,6 +88,9 @@ class SidebarMenuList extends Component {
                           data-page={item.link}
                           target={item.external ? '_blank' : null}
                         >
+                            {
+                                item.icon && <FontAwesomeIcon icon={item.icon} className={'icon'} />
+                            }
                             {item.text}
                         </a>
                     </li>
