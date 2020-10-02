@@ -26,13 +26,22 @@ class SidebarMenuList extends Component {
 
     changePage (e) {
         e.preventDefault();
-        const page = e.target.getAttribute('data-key');
+        const page = e.target.getAttribute('data-page');
 
         this.uiStore.setOpenPage(page);
     }
 
+    getDashboardLink () {
+        return this.userStore.user.apiToken.length ? `https://zohomailtracker.com/web-login?api_token=${this.userStore.user.apiToken}` : '#';
+    }
+
     getListItems () {
         const items = [
+            {
+                text: 'Dashboard',
+                link: this.getDashboardLink(),
+                external: true
+            },
             {
                 text: 'Settings',
                 link: 'settings',
@@ -61,7 +70,14 @@ class SidebarMenuList extends Component {
                       className={`sidebarMenuItem ${item.link === UiStore.openPage ? 'selected' : ''}`}
                       key={index}
                     >
-                        <a href={item.link} onClick={item.click ? item.click : undefined} data-key={item.link}>{item.text}</a>
+                        <a
+                          href={item.link}
+                          onClick={item.click ? item.click : undefined}
+                          data-page={item.link}
+                          target={item.external ? '_blank' : null}
+                        >
+                            {item.text}
+                        </a>
                     </li>
             );
         });

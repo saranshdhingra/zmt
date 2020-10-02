@@ -55,8 +55,8 @@ class UserStore {
         if (data.verified !== undefined) {
             this.setUserVerified(data.verified);
         }
-        if (data.token !== undefined) {
-            this.setUserApiToken(data.token);
+        if (data.apiToken !== undefined) {
+            this.setUserApiToken(data.apiToken);
         }
         if (data.channel !== undefined) {
             this.setChannel(data.channel);

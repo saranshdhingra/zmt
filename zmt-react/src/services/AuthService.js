@@ -21,7 +21,6 @@ class AuthService {
             }
         );
         const data = response.data;
-        console.log(data);
         this.store.setUserEmail(email);
         this.store.setUserVerified(true);
         this.store.setUserApiToken(data.user.api_token);
