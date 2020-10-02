@@ -3,7 +3,6 @@
   --text-color-primary-inverted:#fff;
   --bg-color-primary:#efefef;
   --bg-color-inverted:#fff;
-  --btn-color-primary:#9068be;
   --color-primary:#9068be;
   --color-secondary:#6ed3cf;
   --color-black-op-0-5:rgba(0,0,0,0.5);
@@ -20,6 +19,7 @@ body{
 }
 a,a:hover{
   text-decoration: none;
+  color:inherit;
 }
 a,a:visited{
   color:inherit;
@@ -34,15 +34,19 @@ code{
   border-radius: 4px;
 }
 button.btn-color-primary,
-button.btn-color-primary:hover,
 button.btn-color-primary:active,
 button.btn-color-primary:focus{
-    background-color: var(--btn-color-primary);
+    background-color: var(--color-secondary);
     border: none;
     box-shadow: none;
     color:#fff;
+
+    &:hover{
+      color: #fff;
+      box-shadow: 0 0 2px 1px var(--color-primary);
+    }
 }
 button.btn-color-primary:disabled{
-  background-color: var(--btn-color-primary);
+  background-color: var(--color-secondary);
   cursor: not-allowed;
 }

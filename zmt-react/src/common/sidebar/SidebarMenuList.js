@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
-import './SidebarMenuList.css';
+import './SidebarMenuList.scss';
 import UserStore from '../../stores/UserStore';
 import StorageService from '../../services/StorageService';
 import UiStore from '../../stores/UiStore';
+import { observer } from 'mobx-react';
 
-export default class SidebarMenuList extends Component {
+@observer
+class SidebarMenuList extends Component {
     constructor (props) {
         super(props);
         this.userStore = UserStore;
@@ -56,7 +58,7 @@ export default class SidebarMenuList extends Component {
         return items.map((item, index) => {
             return (
                     <li
-                      className='sidebarMenuItem'
+                      className={`sidebarMenuItem ${item.link === UiStore.openPage ? 'selected' : ''}`}
                       key={index}
                     >
                         <a href={item.link} onClick={item.click ? item.click : undefined} data-key={item.link}>{item.text}</a>
@@ -73,3 +75,5 @@ export default class SidebarMenuList extends Component {
         );
     }
 }
+
+export default SidebarMenuList;
