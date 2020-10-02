@@ -9,13 +9,17 @@
     display: none;
 
     & + span{
+      display: inline-block;
       color: rgb(65, 65, 65);
       background: rgb(215, 215, 215);
       padding: 5px 10px;
+      border-radius:3px;
     }
 
     &:checked + span{
       box-shadow: 0 0 4px rgba(0,0,0,0.4);
+      background-color: var(--btn-color-primary);
+      color:#fff;
     }
   }
 }

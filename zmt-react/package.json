@@ -4,6 +4,9 @@
   "private": true,
   "dependencies": {
     "@babel/core": "7.9.0",
+    "@fortawesome/fontawesome-svg-core": "^1.2.31",
+    "@fortawesome/free-solid-svg-icons": "^5.15.0",
+    "@fortawesome/react-fontawesome": "^0.1.11",
     "@svgr/webpack": "4.3.3",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
@@ -57,9 +60,11 @@
     "sass-loader": "8.0.2",
     "semver": "6.3.0",
     "style-loader": "0.23.1",
+    "sweetalert2": "^10.3.5",
     "terser-webpack-plugin": "2.3.8",
     "ts-pnp": "1.1.6",
     "url-loader": "2.3.0",
+    "validate.js": "^0.13.1",
     "webpack": "4.42.0",
     "webpack-dev-server": "3.11.0",
     "webpack-manifest-plugin": "2.2.0",
@@ -95,17 +100,17 @@
     "presets": [
       "react-app"
     ],
-    "plugins":[
+    "plugins": [
       [
         "@babel/plugin-proposal-decorators",
         {
-          "legacy":true
+          "legacy": true
         }
       ],
       [
         "@babel/plugin-proposal-class-properties",
         {
-          "loose":true
+          "loose": true
         }
       ]
     ]

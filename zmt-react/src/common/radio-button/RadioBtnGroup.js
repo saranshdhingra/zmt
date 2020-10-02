@@ -17,7 +17,7 @@ class RadioBtnGroup extends React.Component {
 
     render () {
         return (
-            <div className={'radioGroup'}>
+            <div className={`radioGroup ${this.props.classes}`}>
                 {this.getRadioBtns()}
             </div>
         );
