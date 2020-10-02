@@ -5,6 +5,8 @@ import SettingsStore from '../stores/SettingsStore';
 import { observer } from 'mobx-react';
 import SettingsBlock from '../components/settings/SettingsBlock';
 import StorageService from '../services/StorageService';
+import { faCog } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 @observer
 class Settings extends Component {
@@ -88,7 +90,10 @@ class Settings extends Component {
             <div className='col-12 tabContent'>
                 <div className={'row justify-content-between'}>
                     <div className={'settingsSection settingsLeft col-12 p-4'}>
-                        <h3>Settings</h3>
+                        <h3>
+                            <FontAwesomeIcon icon={faCog} className={'icon'} />
+                            Settings
+                        </h3>
                         <div className='settingsBox'>
                             {this.getSettings()}
                         </div>

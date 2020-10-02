@@ -1,6 +1,8 @@
 import React from 'react';
 import './Faq.scss';
 import FaqSingleItem from '../components/faq/FaqSingleItem';
+import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 class Faq extends React.Component {
     constructor (props) {
@@ -80,7 +82,10 @@ class Faq extends React.Component {
             <div className='col-12 tabContent'>
                 <div className={'row justify-content-between'}>
                     <div className={'faqContainer'}>
-                        <h3 className={'col-12'}>FAQ</h3>
+                        <h3 className={'col-12'}>
+                            <FontAwesomeIcon icon={faQuestionCircle} className={'icon'} />
+                            FAQ
+                        </h3>
                         <div className={'col-12'}>
                             {this.getFaqComponent()}
                         </div>
