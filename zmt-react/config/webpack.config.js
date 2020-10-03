@@ -194,7 +194,7 @@ module.exports = function(webpackEnv) {
       globalObject: 'this',
     },
     optimization: {
-      minimize: isEnvProduction,
+      minimize: false,
       minimizer: [
         // This is only used in production mode
         new TerserPlugin({
@@ -262,7 +262,7 @@ module.exports = function(webpackEnv) {
       // https://medium.com/webpack/webpack-4-code-splitting-chunk-graph-and-the-splitchunks-optimization-be739a861366
       splitChunks: {
         chunks: 'all',
-        name: false,
+        name: true,
       },
       // Keep the runtime chunk separated to enable long term caching
       // https://twitter.com/wSokra/status/969679223278505985
@@ -389,7 +389,7 @@ module.exports = function(webpackEnv) {
                 cacheDirectory: true,
                 // See #6846 for context on why cacheCompression is disabled
                 cacheCompression: false,
-                compact: isEnvProduction,
+                compact: false,
               },
             },
             // Process any JS outside of the app with Babel.
@@ -460,7 +460,7 @@ module.exports = function(webpackEnv) {
               use: getStyleLoaders(
                 {
                   importLoaders: 3,
-                  sourceMap: isEnvProduction && shouldUseSourceMap,
+                  sourceMap: false && shouldUseSourceMap,
                 },
                 'sass-loader'
               ),
@@ -519,16 +519,16 @@ module.exports = function(webpackEnv) {
           isEnvProduction
             ? {
                 minify: {
-                  removeComments: true,
-                  collapseWhitespace: true,
-                  removeRedundantAttributes: true,
-                  useShortDoctype: true,
-                  removeEmptyAttributes: true,
-                  removeStyleLinkTypeAttributes: true,
+                  removeComments: false,
+                  collapseWhitespace: false,
+                  removeRedundantAttributes: false,
+                  useShortDoctype: false,
+                  removeEmptyAttributes: false,
+                  removeStyleLinkTypeAttributes: false,
                   keepClosingSlash: true,
-                  minifyJS: true,
-                  minifyCSS: true,
-                  minifyURLs: true,
+                  minifyJS: false,
+                  minifyCSS: false,
+                  minifyURLs: false,
                 },
               }
             : undefined
