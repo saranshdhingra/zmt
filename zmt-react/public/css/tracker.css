@@ -1,0 +1,146 @@
+#zmt_loader{
+	position: fixed;
+	z-index:9;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.8);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	pointer-events: none;
+}
+
+#zmt_loader .msg {
+	margin-top: 10px;
+	color: #fff;
+}
+
+#zmt_loader .cancel_div{
+	display:none;
+	color:#fff;
+	margin-top:10px;
+}
+#zmt_loader .cancel_div > a{
+	background: #f15757;
+	color: #fff;
+	padding: 5px 10px;
+	text-decoration: none;
+	border-radius: 5px;
+}
+
+#zmt_loader .cancel_div.visible{
+	display:block;
+}
+
+#zmt_loader.visible {
+	opacity: 1;
+	pointer-events: all;
+}
+
+.loader_spinner {
+	display: inline-block;
+	width: 65px;
+	height: 65px;
+	background-repeat:no-repeat;
+	transform-style: preserve-3d;
+	perspective: 100px;
+}
+
+.loader_spinner.visible {
+	animation: rotate3d 2s infinite;
+}
+
+#zmt_app_alert {
+	position: fixed;
+	z-index:9;
+	right: 0;
+	top: 0;
+	padding: 20px;
+	border-width: 1px;
+	border-style: solid;
+	transform: translateX(100%);
+	transition: all .4s ease-out;
+}
+
+#zmt_app_alert.visible {
+	transform: translateX(0);
+}
+
+#zmt_app_alert.success {
+	background: #dff0d8;
+	border-color: #d0e9c6;
+	color: #3c763d;
+}
+
+#zmt_app_alert.error {
+	background: #f2dede;
+	border-color: #ebcccc;
+	color: #a94442;
+}
+
+#zmt_app_alert.info {
+	background: #fcf8e3;
+	border-color: #faf2cc;
+	color: #8a6d3b;
+}
+
+#zmt_app_alert .close {
+	position: absolute;
+	left: 5px;
+	top: 5px;
+	cursor: pointer;
+	font-size: 14px;
+}
+.zmt_close_btn {
+	width: 10px;
+	min-height: 10px;
+	position: relative;
+	display: block;
+}
+
+.zmt_close_btn:before,
+.zmt_close_btn:after {
+	content: '';
+	display: block;
+	width: 10px;
+	height: 2px;
+	border-radius: 2px;
+	background: #ccc;
+	position: absolute;
+	left: 0;
+	top: 50%;
+	transform: rotate(45deg);
+}
+
+.zmt_close_btn:after {
+	transform: rotate(-45deg);
+}
+
+.zmt_close_btn:hover:before,
+.zmt_close_btn:hover:after {
+	background: #000;
+}
+
+@-webkit-keyframes rotate3d {
+	from {
+		transform: rotateY(0deg);
+	}
+
+	to {
+		transform: rotateY(1080deg);
+	}
+}
+
+@keyframes rotate3d {
+	from {
+		transform: rotateY(0deg);
+	}
+
+	to {
+		transform: rotateY(1080deg);
+	}
+}
