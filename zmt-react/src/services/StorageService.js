@@ -1,6 +1,5 @@
 // import LocalStorageDriver from './drivers/LocalStorageDriver';
 import ChromeStorageDriver from './drivers/ChromeStorageDriver';
-import { isObservableObject, toJS } from 'mobx';
 
 
 class StorageService {
