@@ -8,6 +8,7 @@ import LoginComponent from '../components/settings/LoginComponent';
 import UiStore from '../stores/UiStore';
 import Faq from './Faq';
 import Contact from './Contact';
+import headerBg from '../images/header.png';
 
 @observer
 class Main extends Component {

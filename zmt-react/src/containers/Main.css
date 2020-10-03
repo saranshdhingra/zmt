@@ -1,5 +1,12 @@
-#main{
-    flex:1;
+#main {
+    flex: 1;
     height: 100vh;
     overflow-y: auto;
+    background-image:url('../images/header.png');
+    background-repeat: no-repeat;
+    background-position: right top;
+}
+
+#logo {
+    margin: 40px;
 }

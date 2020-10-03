@@ -89,8 +89,8 @@ class Settings extends Component {
         return (
             <div className='col-12 tabContent'>
                 <div className={'row justify-content-between'}>
-                    <div className={'settingsSection settingsLeft col-12 p-4'}>
-                        <h3>
+                    <div className={'settingsSection settingsLeft col-12'}>
+                        <h3 className={'pageTitle'}>
                             <FontAwesomeIcon icon={faCog} className={'icon'} />
                             Settings
                         </h3>

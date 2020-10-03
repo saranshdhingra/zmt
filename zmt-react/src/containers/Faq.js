@@ -82,7 +82,7 @@ class Faq extends React.Component {
             <div className='col-12 tabContent'>
                 <div className={'row justify-content-between'}>
                     <div className={'faqContainer'}>
-                        <h3 className={'col-12'}>
+                        <h3 className={'pageTitle col-12'}>
                             <FontAwesomeIcon icon={faQuestionCircle} className={'icon'} />
                             FAQ
                         </h3>

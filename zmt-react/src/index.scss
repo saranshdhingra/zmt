@@ -62,3 +62,14 @@ button.btn-color-primary:disabled {
 button > svg {
 	margin-right: 10px;
 }
+
+.pageTitle{
+	color: var(--color-primary);
+	font-size: 2rem;
+	margin-bottom: 40px;
+	margin-top:20px;
+
+	.icon{
+		margin-right:10px;
+	}
+}
