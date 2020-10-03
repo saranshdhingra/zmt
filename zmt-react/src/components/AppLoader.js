@@ -2,7 +2,6 @@ import React from 'react';
 import './AppLoader.css';
 import UserStore from '../stores/UserStore';
 import SettingsStore from '../stores/SettingsStore';
-import config from '../config/env';
 import StorageService from '../services/StorageService';
 
 class AppLoader extends React.Component {

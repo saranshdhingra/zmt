@@ -1,18 +1,19 @@
-import LocalStorageDriver from './drivers/LocalStorageDriver';
+// import LocalStorageDriver from './drivers/LocalStorageDriver';
+import ChromeStorageDriver from './drivers/ChromeStorageDriver';
+import { isObservableObject, toJS } from 'mobx';
 
 
 class StorageService {
     constructor () {
-        this.driver = LocalStorageDriver;
+        this.driver = ChromeStorageDriver;
     }
 
     set (key, val) {
-        return this.driver.set(key, JSON.stringify(val));
+        return this.driver.set(key, val);
     }
 
     async get (key) {
-        let data = await this.driver.get(key);
-        return data ? JSON.parse(data) : data;
+        return await this.driver.get(key);
     }
 
     remove (key) {

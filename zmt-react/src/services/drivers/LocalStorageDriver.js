@@ -7,7 +7,7 @@ class LocalStorageDriver {
      */
     async set (key, val) {
         return new Promise((resolve) => {
-            localStorage.setItem(key, val);
+            localStorage.setItem(key, JSON.stringify(val));
             resolve();
         });
     }
@@ -20,7 +20,7 @@ class LocalStorageDriver {
     async get (key) {
         return new Promise((resolve) => {
             let val = localStorage.getItem(key);
-            resolve(val);
+            resolve(val ? JSON.parse(val) : val);
         });
     }
 
