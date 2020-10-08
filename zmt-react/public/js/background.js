@@ -97,13 +97,13 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 // this makes sure that users don't trigger a 'view' when they see the image themeselves.
 chrome.webRequest.onBeforeRequest.addListener(function (info) {
 	var hash = helpers.getParameterByName('hash', info.url);
-	if (window.settings && window.hashes && window.hashes.indexOf(hash) != -1) {
+	if (window.user && window.user.verified && hash != null && window.hashes && window.hashes.indexOf(hash) != -1) {
 		return {
 			redirectUrl: 'https://zohomailtracker.com/images/onepix.gif'
 		};
 	}
 }, {
-	urls: ['*://zohomailtracker.com/api/v3/img/*']
+	urls: ['*://zohomailtracker.com/api/v3/img/show?hash=*']
 }, ['blocking']);
 
 // message passing receiver
@@ -114,7 +114,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 	if (request.action === 'add_hash') {
 		// it is important to have the latest settings before we add the hash to local.
 		await refreshSettingsFromStorage();
-		let hashes = window.hashes === undefined ? [] : window.hashes;
+		let hashes = window.hashes ? window.hashes : [];
 
 		// if we don't have the hash already, add it
 		// this may happen in case of same messages being pushed from within other places of the extension
@@ -124,8 +124,9 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 		// this step may not be needed, because as soon as we set the new hashes in the storage
 		// refreshSettingsFromStorage  will be called because of the event handler of onChanged
 		window.hashes = hashes;
-		sendResponse({ 'action': 'done' });
 		await helpers.storage.set('hashes', hashes);
+		console.log('added hash', request.hash);
+		sendResponse({ 'action': 'done' });
 	}
 	return true;
 });
