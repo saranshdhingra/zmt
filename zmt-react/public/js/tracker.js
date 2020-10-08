@@ -129,7 +129,11 @@ jQuery(document).ready(async function ($) {
 
 });
 
-// the function that gets the settings from localstorage and then stores a local copy of it!
+/**
+ * the function that gets the settings from localstorage and then stores a local copy of it!
+ * @param callback
+ * @returns {Promise<void>}
+ */
 async function refreshSettingsFromStorage (callback) {
 	log('refreshing settings');
 	window.user = await helpers.storage.get('user');
@@ -163,21 +167,27 @@ async function checkSendBtn (el, recurse) {
 	return !!el.parents('.SC_mclst.zmCnew').find('.SCtxt[data-event=\'s\']:not(.sending)').length;
 }
 
-// button used to replce attr of send button so we can capture its click.
-// basically our fake button
+/**
+ * button used to replace attr of send button so we can capture its click.
+ * basically our fake button
+ */
 function replaceSendBtn (el) {
 	log('inside replaceSendBtn');
-	var sendBtn = el.parents('.SC_mclst.zmCnew').find('.SCtxt[data-event=\'s\']').length ? el.parents('.SC_mclst.zmCnew').find('.SCtxt[data-event=\'s\']') : el.parents('.SC_mclst.zmCnew').find('.SCtxt[data-zmt_event=\'s\']'),
+	let sendBtn = el.parents('.SC_mclst.zmCnew').find('.SCtxt[data-event=\'s\']').length ? el.parents('.SC_mclst.zmCnew').find('.SCtxt[data-event=\'s\']') : el.parents('.SC_mclst.zmCnew').find('.SCtxt[data-zmt_event=\'s\']'),
 		parent = sendBtn.parents('.SC_flt'),
 		sender = getEmailSender(sendBtn),
-		tracking_str = '';
-	if (window.settings && window.settings.tracking && window.user && window.user.verified && !window.needsReload && sender == window.user.email) {
-		tracking_str = `
-			<ul class='zmt_tracking_status'>
-				<li>
-					<img src='${imagesBaseUrl}tracker_inserted.png' data-tooltip="Tracker will be inserted on 'Send'">
-				</li>
-			</ul>`;
+		tooltipValue = '',
+		tooltipSrc = '';
+
+	if (window.settings &&
+		window.settings.tracking &&
+		window.user &&
+		window.user.verified &&
+		!window.needsReload &&
+		sender == window.user.email
+	) {
+		tooltipValue = 'Tracker will be inserted on \'Send\'';
+		tooltipSrc = `${imagesBaseUrl}tracker_inserted.png`;
 
 		// so that I can replace it back!
 		sendBtn.attr('data-zmt_event', 's').removeAttr('data-event');
@@ -187,24 +197,9 @@ function replaceSendBtn (el) {
 	// or if mail tracking is switched off,
 	// or if the user is not verified,
 	// then simply add a visual to show the user that we won't be tracking this mail
-	else if (sendBtn.attr('data-zmt_event') == 's') {
-		let failed_reason = '';
-		if (!window.settings)
-			failed_reason = 'Could not load saved settings!';
-		else if (!window.user)
-			failed_reason = 'User is not logged in!';
-		else if (!window.user.verified)
-			failed_reason = 'User is not verified!';
-		else if (!window.settings.tracking)
-			failed_reason = 'Mail tracking is switched off!';
-		else if (sender != window.user.email)
-			failed_reason = `You are logged in the extension as ${window.user.email} but trying to send the email as ${sender}`;
-		else if (window.needsReload)
-			failed_reason = 'The page needs a reload!';
-
-		failed_reason = `Tracker will not be inserted because ${failed_reason}`;
-
-		tracking_str = `<ul class='zmt_tracking_status'><li><img src='${imagesBaseUrl}tracker_failed.png' data-tooltip='${failed_reason}'></li></ul>`;
+	else {
+		tooltipValue = `Tracker will not be inserted because ${getFailedReason(sender)}`;
+		tooltipSrc = `${imagesBaseUrl}tracker_failed.png`;
 
 		// we remove our custom event attribute so that even if we are not inserting a tracker, people can still send the emails
 		// The need for this arised when we started realtime sync instead of a simple reload.
@@ -212,11 +207,23 @@ function replaceSendBtn (el) {
 		sendBtn.attr('data-event', 's').removeAttr('data-zmt_event');
 	}
 
-	// just to show the current info of tracking status,
-	// but only if the tracking_str string has some value
-	if (tracking_str.length > 0) {
-		parent.find('.zmt_tracking_status').remove();
-		parent.append(tracking_str);
+	// if the icon already exists, then we simply replace the src and tooltip values
+	if (parent.find('.zmt_tracking_status').length) {
+		parent.find('.zmt_tracking_status').attr('data-tooltip', tooltipValue);
+		if (parent.find('zmt_tracking_status').attr('src') !== tooltipSrc) {
+			parent.find('zmt_tracking_status').attr('src', tooltipSrc);
+		}
+	}
+
+	// none found, we insert a new element
+	else {
+		let infoEl = `
+		<ul class='zmt_tracking_status'>
+			<li>
+				<img src="${tooltipSrc}" data-tooltip="${tooltipValue}" />
+			</li>
+		</ul>`;
+		parent.append(infoEl);
 	}
 }
 
@@ -461,4 +468,21 @@ function zmtShowAlert (msg, type) {
 function log () {
 	if (window.settings && window.settings.debug)
 		console.log(arguments);
+}
+
+
+function getFailedReason (sender) {
+	if (!window.settings)
+		return 'could not load saved settings!';
+	else if (!window.user)
+		return 'user is not logged in!';
+	else if (!window.user.verified)
+		return 'user is not verified!';
+	else if (!window.settings.tracking)
+		return 'mail tracking is switched off!';
+	else if (sender != window.user.email)
+		return `you are logged in the extension as ${window.user.email} but trying to send the email as ${sender}`;
+	else if (window.needsReload)
+		return 'the page needs a reload!';
+	return 'something went wrong!';
 }
