@@ -81,7 +81,17 @@ class Settings extends Component {
                 value: setting.value,
                 changed: setting.changed
             };
-            return (<SettingsBlock {...props} />);
+            return (<SettingsBlock {...props} key={index} />);
+        });
+    }
+
+    async componentDidMount () {
+        // update the last_Seen_version, so we remove the 'NEW' text from the extension browser action
+        // eslint-disable-next-line no-undef
+        await StorageService.set('last_seen_version', chrome.app.getDetails().version);
+        // eslint-disable-next-line no-undef
+        chrome.browserAction.setBadgeText({
+            text: ''
         });
     }
 
