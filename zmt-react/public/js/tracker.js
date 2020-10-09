@@ -1,13 +1,23 @@
-var zmt_token,
-	doc_user_email,
-	imagesBaseUrl = chrome.extension.getURL('images/'),
-	needsReload = false,
+const imagesBaseUrl = chrome.extension.getURL('images/'),
+	failureImgSrc = `${imagesBaseUrl}tracker_failed.png`,
+	successImgSrc = `${imagesBaseUrl}tracker_inserted.png`,
 	base_url = 'https://zohomailtracker.com/api/v3/',
+	zohoDomainPattern = new RegExp('^mail\.zoho\.[a-z]+$'),
+	imageHashPattern = /https:\/\/zohomailtracker\.com\/api\/v3\/img\?hash=\w+/,
+	failureMessages = {
+		NEEDS_RELOAD: 'the page needs a reload!',
+		DIFFERENT_USER: (sender) => `you are logged in the extension as ${window.user.email} but trying to send the email as ${sender}`,
+		TRACKING_DISABLED: 'mail tracking is switched off!',
+		UNVERIFIED_USER: 'user is not verified!',
+		ANON_USER: 'user is not logged in!',
+		SETTINGS_UNAVAILABLE: 'could not load saved settings!',
+		DEFAULT_MSG: 'something went wrong!'
+	};
+
+var needsReload = false,
 	zmt_settings,
 	zmtLoaderPromise,
-	zmtReloadCheckHandle,
-	zohoDomainPattern = new RegExp('^mail\.zoho\.[a-z]+$'),
-	imageHashPattern = /https:\/\/zohomailtracker\.com\/api\/v3\/img\?hash=\w+/;
+	zmtReloadCheckHandle;
 
 jQuery(document).ready(async function ($) {
 
@@ -97,36 +107,6 @@ jQuery(document).ready(async function ($) {
 		checkPageNeedsReload();
 	}, 5000);
 
-	// ctrl + Enter capture
-	// $("body").on("keydown",".subject-field",function(e){
-	// 	e.preventDefault();
-	// 	e.stopImmediatePropagation();
-	// 	e.stopPropagation();
-	// 	console.log("keydown");
-	// 	console.log(e);
-	// 	if(e.ctrlKey && e.keyCode == 13){
-	// 		//find the mail which is focussed
-	// 		let sendBtn=$(".zmWorkSpace").find(".SCm").not(".zmHideD").find("[data-zmt_event='s']");
-
-	// 		// console.log(sendBtn);
-	// 	}
-
-	// 	return false;
-	// });
-
-	// $("body").on("keyup",function(e){
-	// 	e.preventDefault();
-	// 	e.stopImmediatePropagation();
-	// 	e.stopPropagation();
-	// 	console.log("keyup");
-	// 	if(e.ctrlKey && e.keyCode == 13){
-	// 		//find the mail which is focussed
-	// 		let sendBtn=$(".zmWorkSpace").find(".SCm").not(".zmHideD").find("[data-zmt_event='s']");
-
-	// 		console.log(sendBtn);
-	// 	}
-	// });
-
 });
 
 /**
@@ -160,9 +140,15 @@ chrome.storage.onChanged.addListener(async function (changes, namespace) {
 	// }
 });
 
-// function that checks that the send button exists in the DOM.
-// this ignores the button with .sending class attached, because at that very moment the mail is sending,
-// so we don't want to interfere
+
+/**
+ * function that checks that the send button exists in the DOM.
+ * this ignores the button with .sending class attached, because at that very moment the mail is sending,
+ * so we don't want to interfere
+ * @param el
+ * @param recurse
+ * @returns {Promise<boolean>}
+ */
 async function checkSendBtn (el, recurse) {
 	return !!el.parents('.SC_mclst.zmCnew').find('.SCtxt[data-event=\'s\']:not(.sending)').length;
 }
@@ -187,7 +173,7 @@ function replaceSendBtn (el) {
 		sender == window.user.email
 	) {
 		tooltipValue = 'Tracker will be inserted on \'Send\'';
-		tooltipSrc = `${imagesBaseUrl}tracker_inserted.png`;
+		tooltipSrc = successImgSrc;
 
 		// so that I can replace it back!
 		sendBtn.attr('data-zmt_event', 's').removeAttr('data-event');
@@ -199,7 +185,7 @@ function replaceSendBtn (el) {
 	// then simply add a visual to show the user that we won't be tracking this mail
 	else {
 		tooltipValue = `Tracker will not be inserted because ${getFailedReason(sender)}`;
-		tooltipSrc = `${imagesBaseUrl}tracker_failed.png`;
+		tooltipSrc = failureImgSrc;
 
 		// we remove our custom event attribute so that even if we are not inserting a tracker, people can still send the emails
 		// The need for this arised when we started realtime sync instead of a simple reload.
@@ -209,9 +195,11 @@ function replaceSendBtn (el) {
 
 	// if the icon already exists, then we simply replace the src and tooltip values
 	if (parent.find('.zmt_tracking_status').length) {
-		parent.find('.zmt_tracking_status').attr('data-tooltip', tooltipValue);
-		if (parent.find('zmt_tracking_status').attr('src') !== tooltipSrc) {
-			parent.find('zmt_tracking_status').attr('src', tooltipSrc);
+		const img = parent.find('.zmt_tracking_status').find('img');
+		img.attr('data-tooltip', tooltipValue);
+		img.attr('alt', tooltipValue);
+		if (img.attr('src') !== tooltipSrc) {
+			img.attr('src', tooltipSrc);
 		}
 	}
 
@@ -401,9 +389,12 @@ function getEmailSender (btn) {
 	return email[0];
 }
 
-// we don't need to rely on the asynchronous nature of sendMessage because
-// if we chrome.runtime is available, then we simply return true.
-// If it is not available and it hit an exception, we return false
+
+/**
+ * we don't need to rely on the asynchronous nature of sendMessage because
+ * if we chrome.runtime is available, then we simply return true.
+ * If it is not available and it hit an exception, we return false
+ */
 function checkPageNeedsReload () {
 	try {
 		chrome.runtime.sendMessage({
@@ -415,9 +406,9 @@ function checkPageNeedsReload () {
 		log('chrome.runtime throws exception, probably page needs reload', err);
 
 		// display the visual
-		$('.zmt_tracking_status').each(function () {
-			$(this).find('li').html(`<img src='${imagesBaseUrl}tracker_failed.png' data-tooltip='Tracker will not be inserted because The page needs a reload!'>`);
-		});
+		// $('.zmt_tracking_status').each(function () {
+		// 	$(this).find('li').html(`<img src="${failureImgSrc}" data-tooltip="Tracker will not be inserted because ${failureMessages.NEEDS_RELOAD}" alt="Tracker will not be inserted because ${failureMessages.NEEDS_RELOAD}" />`);
+		// });
 
 		// remove the tracker handler
 		$('[data-zmt_event=\'s\']').removeAttr('data-zmt_event').attr('data-event', 's');
@@ -465,24 +456,31 @@ function zmtShowAlert (msg, type) {
 	$('#zmt_app_alert').addClass(['visible', type]);
 }
 
+/**
+ * Helper log function
+ */
 function log () {
 	if (window.settings && window.settings.debug)
 		console.log(arguments);
 }
 
-
+/**
+ * Computes the reason why the tracker won't be inserted to show it to the user.
+ * @param sender
+ * @returns {string}
+ */
 function getFailedReason (sender) {
 	if (!window.settings)
-		return 'could not load saved settings!';
+		return failureMessages.SETTINGS_UNAVAILABLE;
 	else if (!window.user)
-		return 'user is not logged in!';
+		return failureMessages.ANON_USER;
 	else if (!window.user.verified)
-		return 'user is not verified!';
+		return failureMessages.UNVERIFIED_USER;
 	else if (!window.settings.tracking)
-		return 'mail tracking is switched off!';
-	else if (sender != window.user.email)
-		return `you are logged in the extension as ${window.user.email} but trying to send the email as ${sender}`;
+		return failureMessages.TRACKING_DISABLED;
+	else if (sender !== window.user.email)
+		return failureMessages.DIFFERENT_USER(sender);
 	else if (window.needsReload)
-		return 'the page needs a reload!';
-	return 'something went wrong!';
+		return failureMessages.NEEDS_RELOAD;
+	return failureMessages.DEFAULT_MSG;
 }
