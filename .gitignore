@@ -1,6 +1,7 @@
 #Project
 js/environment.js
 zmt-react/src/config/env.js
+zmt-react/public/js/environment.js
 
 #Genral/Build tools
 .idea/
