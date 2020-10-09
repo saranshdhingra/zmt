@@ -1,3 +1,12 @@
+const notificationImgUrl = 'images/icon_notif.png',
+	notificationTypes = {
+		EMAIL_VIEW: { key: 'emailView', id: 'zmt_email' },
+		CONTACT: { key: 'contact', id: 'zmt_contact' },
+		GLOBAL: { key: 'global', id: 'zmt_global' }
+	},
+	blockingUrl = '*://zohomailtracker.com/api/v3/img/show?hash=*',
+	replacementPixelUrl = 'https://zohomailtracker.com/images/onepix.gif';
+
 class PubNubManager {
 	constructor () {
 		this.pubnub = false;
@@ -13,64 +22,70 @@ class PubNubManager {
 			});
 
 			this.pubnub.addListener({
-				message: function (message) {
+				message: (message) => {
 					// handle message
-					try {
-						let type = message.message.type;
-						if (type == 'emailView') {
-							chrome.notifications.create(`zmt_email_${message.message.id}`, {
-								type: 'basic',
-								title: 'Someone viewed an email!',
-								message: `Subject: ${message.message.sub}\nLocation: ${message.message.location}`,
-								iconUrl: 'images/icon_notif.png'
-							});
-						}
-						else if (type == 'contact') {
-							chrome.notifications.create(`zmt_contact_${(new Date()).getMilliseconds()}`, {
-								type: 'basic',
-								title: 'Someone sent a contact entry!',
-								message: `Type:${message.message.contactType}\nEmail:${message.message.email}`,
-								iconUrl: 'images/icon_notif.png'
-							});
-						}
-						else if (type == 'global') {
-							chrome.notifications.create(`zmt_global_${(new Date()).getMilliseconds()}`, {
-								type: 'basic',
-								title: message.message.title,
-								message: message.message.body,
-								iconUrl: 'images/icon_notif.png'
-							});
-						}
-					}
-					catch (err) {
-					}
+					this.displayNotification(message);
 				}
 			});
 		}
 	}
 
-	attachChannel (name) {
+	async attachChannel (name) {
+		console.log('attaching channel');
+
 		// no need to resubscribe
-		if (this.pubnub !== false && name !== false && this.channelName != name) {
-			this.pubnub.subscribe({
-				// channels: [zmt_settings.user.channel],
+		if (this.pubnub && name && this.channelName !== name) {
+			await this.pubnub.subscribe({
 				channels: [name]
 			});
 			this.channelName = name;
 		}
 	}
 
-	detachChannel () {
+	async detachChannel () {
+		console.log('detaching channel');
 		if (this.pubnub !== false && this.channelName !== false) {
-			this.pubnub.unsubscribe({
+			await this.pubnub.unsubscribe({
 				channels: [this.channelName]
 			});
 			this.channelName = false;
 		}
 	}
+
+	displayNotification (message) {
+		try {
+			const type = message.message.type;
+			if (type === notificationTypes.EMAIL_VIEW.key) {
+				chrome.notifications.create(`${notificationTypes.EMAIL_VIEW.id}_${message.message.id}`, {
+					type: 'basic',
+					title: 'Someone viewed an email!',
+					message: `Subject: ${message.message.sub}\nLocation: ${message.message.location}`,
+					iconUrl: notificationImgUrl
+				});
+			}
+			else if (type === notificationTypes.CONTACT.key) {
+				chrome.notifications.create(`${notificationTypes.CONTACT.id}_${(new Date()).getMilliseconds()}`, {
+					type: 'basic',
+					title: 'Someone sent a contact entry!',
+					message: `Type:${message.message.contactType}\nEmail:${message.message.email}`,
+					iconUrl: notificationImgUrl
+				});
+			}
+			else if (type === notificationTypes.GLOBAL.key) {
+				chrome.notifications.create(`${notificationTypes.GLOBAL.id}_${(new Date()).getMilliseconds()}`, {
+					type: 'basic',
+					title: message.message.title,
+					message: message.message.body,
+					iconUrl: notificationImgUrl
+				});
+			}
+		}
+		catch (err) {
+		}
+	}
 }
 
-var pubnubManager = new PubNubManager();
+const pubnubManager = new PubNubManager();
 
 // when extension is loaded
 chrome.runtime.onInstalled.addListener(async function () {
@@ -99,16 +114,17 @@ chrome.webRequest.onBeforeRequest.addListener(function (info) {
 	const hash = helpers.getParameterByName('hash', info.url);
 	if (window.user && window.user.verified && hash != null && window.hashes && window.hashes.indexOf(hash) != -1) {
 		return {
-			redirectUrl: 'https://zohomailtracker.com/images/onepix.gif'
+			redirectUrl: replacementPixelUrl
 		};
 	}
 }, {
-	urls: ['*://zohomailtracker.com/api/v3/img/show?hash=*']
+	urls: [blockingUrl]
 }, ['blocking']);
 
-// message passing receiver
-// this should take care of things like dynamically adding hashes to our whitelist
-// need to refresh zmt_settings here
+/**
+ * message passing receiver
+ * this should take care of things like dynamically adding hashes to our whitelist
+ */
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
 
 	if (request.action === 'add_hash') {
@@ -125,7 +141,6 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 		// refreshSettingsFromStorage  will be called because of the event handler of onChanged
 		window.hashes = hashes;
 		await helpers.storage.set('hashes', hashes);
-		console.log('added hash', request.hash);
 		sendResponse({ 'action': 'done' });
 	}
 	return true;
@@ -144,7 +159,7 @@ async function refreshSettingsFromStorage () {
 	window.settings = settings;
 	window.hashes = hashes;
 
-	if (user !== undefined && settings !== undefined && user.verified && user.channel != undefined && settings.notifications) {
+	if (user && user.verified && user.channel && settings && settings.notifications) {
 		pubnubManager.initPubnub();
 		pubnubManager.attachChannel(user.channel);
 	}
@@ -154,8 +169,23 @@ async function refreshSettingsFromStorage () {
 }
 
 
-// whenever the storage is changed,
-// we make sure to refresh it here
+/**
+ * whenever the storage is changed,
+ * we make sure to refresh it here
+ */
 chrome.storage.onChanged.addListener(async function (changes, namespace) {
 	await refreshSettingsFromStorage();
+});
+
+
+/**
+ * When the notification balloon is clicked
+ * We should open the extension page
+ */
+chrome.notifications.onClicked.addListener(function (notificationId) {
+	if (notificationId.indexOf(notificationTypes.EMAIL_VIEW.id) === 0 || notificationId.indexOf(notificationTypes.GLOBAL.id) === 0) {
+		chrome.tabs.create({
+			url: 'index.html'
+		});
+	}
 });

@@ -13,7 +13,8 @@ const imagesBaseUrl = chrome.extension.getURL('images/'),
 		SETTINGS_UNAVAILABLE: 'could not load saved settings!',
 		DEFAULT_MSG: 'something went wrong!'
 	},
-	alertElId = 'zmt_app_alert';
+	alertElId = 'zmt_app_alert',
+	loaderId = 'zmt_loader';
 
 var needsReload = false,
 	zmtLoaderPromise,
@@ -26,20 +27,7 @@ jQuery(document).ready(async function ($) {
 		return;
 	}
 
-	// add the zmt loader and alert HTML
-	$('body').append(`
-		<div id='zmt_loader'>
-			<div class='loader_spinner' style='background:url(${imagesBaseUrl}logo64.png);'></div>
-			<div class='msg'></div>
-			<div class='cancel_div'>
-				If this is taking time, you can <a href='#'>cancel the tracker</a> and send the mail untracked!
-			</div>
-		</div>`);
-	$('body').append(`
-		<div id='${alertElId}'>
-			<div class='content'></div>
-			<div class='close'><i class='zmt_close_btn'></i></div>
-		</div>`);
+	addBoilerplateHtml();
 
 	await refreshSettingsFromStorage();
 
@@ -91,7 +79,7 @@ jQuery(document).ready(async function ($) {
 
 	// our failsafe that cancels the tracker and simply sends the mail
 	// in cases like it takes too long or something!
-	$('body').on('click', '#zmt_loader .cancel_div a', function (e) {
+	$('body').on('click', `#${loaderId} .cancel_div a`, function (e) {
 		e.preventDefault();
 		log('Tracking canceled!');
 		$('[data-zmt_event=\'s\'].sending').each(async function () {
@@ -113,7 +101,7 @@ jQuery(document).ready(async function ($) {
  * @param callback
  * @returns {Promise<void>}
  */
-async function refreshSettingsFromStorage (callback) {
+async function refreshSettingsFromStorage () {
 	log('refreshing settings');
 	window.user = await helpers.storage.get('user');
 	window.settings = await helpers.storage.get('settings');
@@ -461,10 +449,10 @@ function checkPageNeedsReload () {
  * @param cancellable
  */
 function zmtShowLoader (msg, cancellable) {
-	$('#zmt_loader').find('.msg').text(msg);
-	$('#zmt_loader').addClass('visible').find('.loader_spinner').addClass('visible');
+	$(`#${loaderId}`).find('.msg').text(msg);
+	$(`#${loaderId}`).addClass('visible').find('.loader_spinner').addClass('visible');
 	if (cancellable === true) {
-		$('#zmt_loader').find('.cancel_div').addClass('visible');
+		$(`#${loaderId}`).find('.cancel_div').addClass('visible');
 	}
 	zmtLoaderPromise = new Promise(function (resolve, reject) {
 		setTimeout(function () {
@@ -484,8 +472,8 @@ async function zmtHideLoader () {
 	// show_loader we still show the loader for at least the duration of the timeout
 	// used inside the showLoader method
 	await zmtLoaderPromise;
-	$('#zmt_loader').find('.msg').text('');
-	$('#zmt_loader').removeClass('visible').find('.loader_spinner').removeClass('visible');
+	$(`${loaderId}`).find('.msg').text('');
+	$(`${loaderId}`).removeClass('visible').find('.loader_spinner').removeClass('visible');
 }
 
 /**
@@ -530,4 +518,24 @@ function getFailedReason (sender) {
 	else if (window.needsReload)
 		return failureMessages.NEEDS_RELOAD;
 	return failureMessages.DEFAULT_MSG;
+}
+
+/**
+ * Func that appends HTML elements to DOM for our use
+ */
+function addBoilerplateHtml () {
+	// add the zmt loader and alert HTML
+	$('body').append(`
+		<div id='${loaderId}'>
+			<div class='loader_spinner' style='background:url(${imagesBaseUrl}logo64.png);'></div>
+			<div class='msg'></div>
+			<div class='cancel_div'>
+				If this is taking time, you can <a href='#'>cancel the tracker</a> and send the mail untracked!
+			</div>
+		</div>`);
+	$('body').append(`
+		<div id='${alertElId}'>
+			<div class='content'></div>
+			<div class='close'><i class='zmt_close_btn'></i></div>
+		</div>`);
 }
