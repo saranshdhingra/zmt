@@ -3,7 +3,6 @@ const imagesBaseUrl = chrome.extension.getURL('images/'),
 	successImgSrc = `${imagesBaseUrl}tracker_inserted.png`,
 	base_url = 'https://zohomailtracker.com/api/v3/',
 	zohoDomainPattern = new RegExp('^mail\.zoho\.[a-z]+$'),
-	imageHashPattern = /https:\/\/zohomailtracker\.com\/api\/v3\/img\?hash=\w+/,
 	failureMessages = {
 		NEEDS_RELOAD: 'the page needs a reload!',
 		DIFFERENT_USER: (sender) => `you are logged in the extension as ${window.user.email} but trying to send the email as ${sender}`,

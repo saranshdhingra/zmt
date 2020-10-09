@@ -4,5 +4,4 @@ const env = {
 	pubnub: {
 		subscribeKey: ''
 	}
-
 };
