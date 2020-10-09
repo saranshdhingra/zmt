@@ -121,23 +121,27 @@ async function refreshSettingsFromStorage (callback) {
 	window.hashes = await helpers.storage.get('hashes');
 }
 
-// whenever the storage is changed,
-// we make sure to refresh it here
+/**
+ * whenever the storage is changed,
+ * we make sure to refresh it here
+ */
 chrome.storage.onChanged.addListener(async function (changes, namespace) {
 	log('storage changed');
 
-	// if (Object.keys(changes).indexOf("zmt_settings") != -1) {
-	// 	log("zmt settings changed");
+	// this is so that we don't refresh only when hashes are changed
+	// this happens everytime an email is sent,
+	// so refreshing while sending is not needed
+	if (changes.user !== undefined || changes.settings != undefined) {
+		log('zmt settings changed');
 		await refreshSettingsFromStorage();
 
 		// this makes sure if someone changes a setting, like user, mail tracking etc
 		// it is reflected in the emails that are opened w/o a need for reload
 		$('[data-event=\'s\']:not(.sending),[data-zmt_event=\'s\']:not(.sending)').each(function () {
-			var btn = $(this);
-			replaceSendBtn(btn);
+			// $(this) is the button
+			replaceSendBtn($(this));
 		});
-
-	// }
+	}
 });
 
 
@@ -170,7 +174,7 @@ function replaceSendBtn (el) {
 		window.user &&
 		window.user.verified &&
 		!window.needsReload &&
-		sender == window.user.email
+		sender === window.user.email
 	) {
 		tooltipValue = 'Tracker will be inserted on \'Send\'';
 		tooltipSrc = successImgSrc;
@@ -247,11 +251,16 @@ async function insertTracker (sendBtn) {
 
 		let pixelImage = `<img src='${base_url}img/show?hash=${hash}' class='zmt_pixel' />`;
 
-		// let pixelImage = '<div><img src="https://cdn.pixabay.com/photo/2016/11/29/05/45/astronomy-1867616__340.jpg" class="zmt_pixel" /><br /></div>';
-
 		// first make sure that the hash is added to the list of hashes to be blocked, then append the image in the ,mail.
 		await addHashToStorage(hash);
-		console.log('hash added to localstorage', hash);
+		log('hash added to localstorage', hash);
+
+		// this is done because the onStorage Changed listener doesn't refresh the window settings when the hashes are changed.
+		// this is done to avoid unnecessary refresh cycles.
+		// the hash is only refreshed from here, moreover we it's not important for tracker to have an updated copy of the hashes immediately
+		if (window.hashes.indexOf(hash) === -1) {
+			window.hashes.push(hash);
+		}
 
 		zmtHideLoader(function () {
 			log('zmtHideLoader callback');
@@ -361,14 +370,19 @@ async function fetchHashFromServer (sendBtn, subject, toField, ccField, bccField
 	});
 }
 
-// add a hash to the localstorage by sending this msg to background script
+/**
+ * add a hash to the localstorage by sending this msg to background script
+ */
 async function addHashToStorage (hash) {
 	log('addHashToStorage func for hash', hash);
 	return new Promise((resolve) => {
 		chrome.runtime.sendMessage({
 			action: 'add_hash',
 			hash: hash
-		}, resolve);
+		}, (response) => {
+			log('runtime.sendMessage callback');
+			resolve();
+		});
 	});
 }
 
