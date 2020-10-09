@@ -94,11 +94,9 @@ jQuery(document).ready(async function ($) {
 	$('body').on('click', '#zmt_loader .cancel_div a', function (e) {
 		e.preventDefault();
 		log('Tracking canceled!');
-		$('[data-zmt_event=\'s\'].sending').each(function () {
-			let btn = $(this);
-			zmtHideLoader(function () {
-				sendMail(btn);
-			});
+		$('[data-zmt_event=\'s\'].sending').each(async function () {
+			await zmtHideLoader();
+			sendMail($(this));
 		});
 	});
 
@@ -240,17 +238,14 @@ async function insertTracker (sendBtn) {
 			bccField = getBccFromSendBtn(sendBtn);
 
 		if (!toField.length) {
-			zmtHideLoader(function () {
-				zmtShowAlert('Please fill up the Recipient!', 'error');
-			});
+			await zmtHideLoader();
+			zmtShowAlert('Please fill up the Recipient!', 'error');
 			return;
 		}
 
 		log('fetching hash from server');
 		const hash = await fetchHashFromServer(sendBtn, subject, toField, ccField, bccField);
 		log('hash received from server', hash);
-
-		let pixelImage = `<img src='${base_url}img/show?hash=${hash}' class='zmt_pixel' />`;
 
 		// first make sure that the hash is added to the list of hashes to be blocked, then append the image in the ,mail.
 		await addHashToStorage(hash);
@@ -263,16 +258,14 @@ async function insertTracker (sendBtn) {
 			window.hashes.push(hash);
 		}
 
-		zmtHideLoader(function () {
-			log('zmtHideLoader callback');
-			mailBody.contents().find('body').append(pixelImage);
-		});
+		await zmtHideLoader();
+		let pixelImage = `<div class="zmt_pixel_div"><img src='${base_url}img/show?hash=${hash}' class='zmt_pixel' /><br /></div>`;
+		mailBody.contents().find('body').append(pixelImage);
 	}
 	catch (err) {
 		log('Tracker failed', err);
-		zmtHideLoader(function () {
-			zmtShowAlert('Tracker inserting failed!', 'error');
-		});
+		await zmtHideLoader();
+		zmtShowAlert('Tracker inserting failed!', 'error');
 	}
 }
 
@@ -283,13 +276,9 @@ async function insertTracker (sendBtn) {
  * @param mailBody
  */
 function removeCurrentPixelsFromMail (mailBody) {
-	mailBody.contents().find('img').filter(function () {
-		let src = $(this).attr('src');
-
-		// src was sometimes undefined
-		if (typeof src != 'undefined' && src.match(imageHashPattern)) {
-			$(this).remove();
-		}
+	// Zoho converts the classes, so we simply remove divs containing zmt_pixel_div class
+	mailBody.contents().find('div[class*="zmt_pixel_div"]').filter(function () {
+		$(this).remove();
 	});
 }
 
@@ -374,7 +363,7 @@ async function fetchHashFromServer (sendBtn, subject, toField, ccField, bccField
 			to_field: toField,
 			cc_field: ccField,
 			bcc_field: bccField
-		}, function (response) {
+		}, async function (response) {
 			// TODO, change this way of checking success
 			if (response.code == '1') {
 				resolve(response.hash);
@@ -382,10 +371,9 @@ async function fetchHashFromServer (sendBtn, subject, toField, ccField, bccField
 			else {
 				log('Response code invalid while fetching hash', response);
 				reject('Unable to generate tracking pixel!');
-				zmtHideLoader(function () {
-					zmtShowAlert('Tracker inserting failed!', 'error');
-					sendMail(sendBtn);
-				});
+				await zmtHideLoader();
+				zmtShowAlert('Tracker inserting failed!', 'error');
+				sendMail(sendBtn);
 			}
 		}).fail(function (err) {
 			log('ajax request failed in fetchHashFromServer', err);
@@ -489,17 +477,15 @@ function zmtShowLoader (msg, cancellable) {
  * hide the loader
  * @param callback
  */
-function zmtHideLoader (callback) {
+async function zmtHideLoader () {
+	log('inside zmtHideLoader');
+
 	// this will make sure that even if the hideLoader is called immediately after
 	// show_loader we still show the loader for at least the duration of the timeout
 	// used inside the showLoader method
-	zmtLoaderPromise.then(function () {
-		$('#zmt_loader').find('.msg').text('');
-		$('#zmt_loader').removeClass('visible').find('.loader_spinner').removeClass('visible');
-		if (callback !== undefined) {
-			callback();
-		}
-	});
+	await zmtLoaderPromise;
+	$('#zmt_loader').find('.msg').text('');
+	$('#zmt_loader').removeClass('visible').find('.loader_spinner').removeClass('visible');
 }
 
 /**

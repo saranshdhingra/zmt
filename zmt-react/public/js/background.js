@@ -96,7 +96,7 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 
 // this makes sure that users don't trigger a 'view' when they see the image themeselves.
 chrome.webRequest.onBeforeRequest.addListener(function (info) {
-	var hash = helpers.getParameterByName('hash', info.url);
+	const hash = helpers.getParameterByName('hash', info.url);
 	if (window.user && window.user.verified && hash != null && window.hashes && window.hashes.indexOf(hash) != -1) {
 		return {
 			redirectUrl: 'https://zohomailtracker.com/images/onepix.gif'
