@@ -12,10 +12,10 @@ const imagesBaseUrl = chrome.extension.getURL('images/'),
 		ANON_USER: 'user is not logged in!',
 		SETTINGS_UNAVAILABLE: 'could not load saved settings!',
 		DEFAULT_MSG: 'something went wrong!'
-	};
+	},
+	alertElId = 'zmt_app_alert';
 
 var needsReload = false,
-	zmt_settings,
 	zmtLoaderPromise,
 	zmtReloadCheckHandle;
 
@@ -36,7 +36,7 @@ jQuery(document).ready(async function ($) {
 			</div>
 		</div>`);
 	$('body').append(`
-		<div id='zmt_app_alert'>
+		<div id='${alertElId}'>
 			<div class='content'></div>
 			<div class='close'><i class='zmt_close_btn'></i></div>
 		</div>`);
@@ -84,8 +84,9 @@ jQuery(document).ready(async function ($) {
 		}, 500);
 	});
 
-	$('body').find('#zmt_app_alert .close').on('click', function () {
-		$('#zmt_app_alert').removeClass(['visible', 'success', 'error', 'info']);
+
+	$('body').find(`#${alertElId} .close`).on('click', function () {
+		$('#{alertElId}').removeClass(['visible', 'success', 'error', 'info']);
 	});
 
 	// our failsafe that cancels the tracker and simply sends the mail
@@ -231,12 +232,12 @@ async function insertTracker (sendBtn) {
 		// find the tracking pixel in this mail and the subject of the mail
 		let mailBody = sendBtn.parents('.SC_mclst.zmCnew').find('.zmCE').find('.ze_area');
 
-		remove_current_pixels_from_mail(mailBody);
+		removeCurrentPixelsFromMail(mailBody);
 
-		let subject = get_subject_field_val(sendBtn),
-			toField = get_to_field_val(sendBtn),
-			ccField = get_cc_field_val(sendBtn),
-			bccField = get_bcc_field_val(sendBtn);
+		let subject = getSubjectFromSendBtn(sendBtn),
+			toField = getRecipientFromSendBtn(sendBtn),
+			ccField = getCcFromSendBtn(sendBtn),
+			bccField = getBccFromSendBtn(sendBtn);
 
 		if (!toField.length) {
 			zmtHideLoader(function () {
@@ -275,11 +276,14 @@ async function insertTracker (sendBtn) {
 	}
 }
 
-// function that checks if the tracking pixel is present in the mailBody element
-// if a pixel is present, it removes it which means that in replies, or nested threads, a user won't get multiple notifications
-// mailBody is the jquery element(iframe element)
-function remove_current_pixels_from_mail (mailBody) {
-	var imgs = mailBody.contents().find('img').filter(function () {
+/**
+ * function that checks if the tracking pixel is present in the mailBody element
+ * if a pixel is present, it removes it which means that in replies, or nested threads, a user won't get multiple notifications
+ * mailBody is the jquery element(iframe element)
+ * @param mailBody
+ */
+function removeCurrentPixelsFromMail (mailBody) {
+	mailBody.contents().find('img').filter(function () {
 		let src = $(this).attr('src');
 
 		// src was sometimes undefined
@@ -289,16 +293,26 @@ function remove_current_pixels_from_mail (mailBody) {
 	});
 }
 
-function get_subject_field_val (send_btn) {
+/**
+ * Computes the Subject relative to the send btn, which it fetches from the DOM.
+ * @param send_btn
+ * @returns {*|string|undefined}
+ */
+function getSubjectFromSendBtn (send_btn) {
 	return send_btn.parents('.SC_mclst.zmCnew').find('[id^=\'zmsub_Cmp\']').val();
 }
 
-function get_to_field_val (send_btn) {
+/**
+ * Computes the Recipient relative to the send btn, which it fetches from the DOM.
+ * @param send_btn
+ * @returns {*}
+ */
+function getRecipientFromSendBtn (send_btn) {
 	return send_btn.parents('.SC_mclst.zmCnew').find('.zmCTxt.zmdrop.recipient-field').eq(0).find('.SC_cs').map(function () {
-		var tooltip = $(this).attr('data-tooltip'),
-			email = extractEmails(tooltip);
+		let tooltip = $(this).attr('data-tooltip'),
+			email = helpers.extractEmailsFromText(tooltip);
 
-			if (email.length > 0 && is_email_valid(email[0])) {
+			if (email.length > 0 && helpers.is_email_valid(email[0])) {
 				return email[0];
 			}
 			else {
@@ -307,12 +321,17 @@ function get_to_field_val (send_btn) {
 	}).get().join(',');
 }
 
-function get_cc_field_val (send_btn) {
+/**
+ * Computes the CC relative to the send btn, which it fetches from the DOM.
+ * @param send_btn
+ * @returns {*}
+ */
+function getCcFromSendBtn (send_btn) {
 	return send_btn.parents('.SC_mclst.zmCnew').find('.zmCTxt.zmdrop.recipient-field').eq(1).find('.SC_cs').map(function () {
-		var tooltip = $(this).attr('data-tooltip'),
-			email = extractEmails(tooltip);
+		let tooltip = $(this).attr('data-tooltip'),
+			email = helpers.extractEmailsFromText(tooltip);
 
-		if (email.length > 0 && is_email_valid(email[0])) {
+		if (email.length > 0 && helpers.is_email_valid(email[0])) {
 			return email[0];
 		} else {
 			return $(this).find('input').val();
@@ -320,12 +339,17 @@ function get_cc_field_val (send_btn) {
 	}).get().join(',');
 }
 
-function get_bcc_field_val (send_btn) {
+/**
+ * Computes the BCC relative to the send btn, which it fetches from the DOM.
+ * @param send_btn
+ * @returns {*}
+ */
+function getBccFromSendBtn (send_btn) {
 	return send_btn.parents('.SC_mclst.zmCnew').find('.zmCTxt.zmdrop.recipient-field').eq(2).find('.SC_cs').map(function () {
-		var tooltip = $(this).attr('data-tooltip'),
-			email = extractEmails(tooltip);
+		let tooltip = $(this).attr('data-tooltip'),
+			email = helpers.extractEmailsFromText(tooltip);
 
-		if (email.length > 0 && is_email_valid(email[0])) {
+		if (email.length > 0 && helpers.is_email_valid(email[0])) {
 			return email[0];
 		} else {
 			return $(this).find('input').val();
@@ -333,15 +357,15 @@ function get_bcc_field_val (send_btn) {
 	}).get().join(',');
 }
 
-function extractEmails (text) {
-	return text.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi);
-}
-
-function is_email_valid (email) {
-	var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-	return re.test(String(email).toLowerCase());
-}
-
+/**
+ * Func that actually gets a new pixel from the server
+ * @param sendBtn
+ * @param subject
+ * @param toField
+ * @param ccField
+ * @param bccField
+ * @returns {Promise<unknown>}
+ */
 async function fetchHashFromServer (sendBtn, subject, toField, ccField, bccField) {
 	return new Promise((resolve, reject) => {
 		$.post(base_url + 'img/new', {
@@ -386,6 +410,10 @@ async function addHashToStorage (hash) {
 	});
 }
 
+/**
+ * Func called when all other steps are done and we only need to send the email from Zoho's side
+ * @param btn
+ */
 function sendMail (btn) {
 	log('sendMail called');
 	btn.removeClass('sending');
@@ -393,11 +421,16 @@ function sendMail (btn) {
 	btn.find('b').trigger('click');
 }
 
+/**
+ * Computes the sender that will be used for sending this email
+ * @param btn
+ * @returns {string}
+ */
 function getEmailSender (btn) {
 	var emailField = btn.parents('.SC_mclst.zmCnew').find('[id^=\'zm_fromaddr_Cmp\']'),
 		email = [''];
 	if (emailField.length) {
-		email = extractEmails(emailField.text());
+		email = helpers.extractEmailsFromText(emailField.text());
 	}
 
 	return email[0];
@@ -418,11 +451,12 @@ function checkPageNeedsReload () {
 	}
 	catch (err) {
 		log('chrome.runtime throws exception, probably page needs reload', err);
+		const failureReason = `Tracker will not be inserted because ${failureMessages.NEEDS_RELOAD}`;
 
-		// display the visual
-		// $('.zmt_tracking_status').each(function () {
-		// 	$(this).find('li').html(`<img src="${failureImgSrc}" data-tooltip="Tracker will not be inserted because ${failureMessages.NEEDS_RELOAD}" alt="Tracker will not be inserted because ${failureMessages.NEEDS_RELOAD}" />`);
-		// });
+		// update any icons showing success indicators
+		$('.zmt_tracking_status').each(function () {
+			$(this).find('img').attr('src', failureImgSrc).attr('data-tooltip', failureReason).attr('alt', failureReason);
+		});
 
 		// remove the tracker handler
 		$('[data-zmt_event=\'s\']').removeAttr('data-zmt_event').attr('data-event', 's');
@@ -433,7 +467,11 @@ function checkPageNeedsReload () {
 	window.needsReload = false;
 }
 
-// the function that shows the loader inside UI
+/**
+ * the function that shows the loader inside UI
+ * @param msg
+ * @param cancellable
+ */
 function zmtShowLoader (msg, cancellable) {
 	$('#zmt_loader').find('.msg').text(msg);
 	$('#zmt_loader').addClass('visible').find('.loader_spinner').addClass('visible');
@@ -447,7 +485,10 @@ function zmtShowLoader (msg, cancellable) {
 	});
 }
 
-// hide the loader
+/**
+ * hide the loader
+ * @param callback
+ */
 function zmtHideLoader (callback) {
 	// this will make sure that even if the hideLoader is called immediately after
 	// show_loader we still show the loader for at least the duration of the timeout
@@ -461,13 +502,19 @@ function zmtHideLoader (callback) {
 	});
 }
 
+/**
+ * Shows alert on the side of the screen
+ * @param msg
+ * @param type
+ * @returns {boolean}
+ */
 function zmtShowAlert (msg, type) {
 	let allowedTypes = ['success', 'error', 'info'];
-	if (allowedTypes.indexOf(type) == -1)
+	if (allowedTypes.indexOf(type) === -1)
 		return false;
 
-	$('#zmt_app_alert').find('.content').html(msg);
-	$('#zmt_app_alert').addClass(['visible', type]);
+	$(`#${alertElId}`).find('.content').html(msg);
+	$(`#${alertElId}`).addClass(['visible', type]);
 }
 
 /**
