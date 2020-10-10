@@ -471,8 +471,8 @@ async function zmtHideLoader () {
 	// show_loader we still show the loader for at least the duration of the timeout
 	// used inside the showLoader method
 	await zmtLoaderPromise;
-	$(`${loaderId}`).find('.msg').text('');
-	$(`${loaderId}`).removeClass('visible').find('.loader_spinner').removeClass('visible');
+	$(`#${loaderId}`).find('.msg').text('');
+	$(`#${loaderId}`).removeClass('visible').find('.loader_spinner').removeClass('visible');
 }
 
 /**
