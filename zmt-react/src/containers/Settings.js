@@ -7,6 +7,7 @@ import SettingsBlock from '../components/settings/SettingsBlock';
 import StorageService from '../services/StorageService';
 import { faCog } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import BrowserService from '../services/BrowserService';
 
 @observer
 class Settings extends Component {
@@ -88,11 +89,9 @@ class Settings extends Component {
     async componentDidMount () {
         // update the last_Seen_version, so we remove the 'NEW' text from the extension browser action
         // eslint-disable-next-line no-undef
-        await StorageService.set('last_seen_version', chrome.app.getDetails().version);
+        await StorageService.set('last_seen_version', BrowserService.getCurrentVersion());
         // eslint-disable-next-line no-undef
-        chrome.browserAction.setBadgeText({
-            text: ''
-        });
+        BrowserService.removeBadgeText();
     }
 
     render () {

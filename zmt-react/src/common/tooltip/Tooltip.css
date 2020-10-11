@@ -1,0 +1,70 @@
+.customTooltip.style-1,
+.customTooltip.style-2{
+    font-size:1.2rem;
+    color:#fff;
+    cursor: pointer;
+    position:relative;
+}
+.customTooltip.style-2{
+    color:#000;
+}
+.customTooltip .content{
+    position: absolute;
+    opacity:0;
+    pointer-events: none;
+    background-color: var(--color-primary);
+    color:#fff;
+    font-size: .8rem;
+    min-width: 200px;
+    padding: 20px;
+    border-radius: 5px;
+    transition: all .4s ease-out;
+}
+.customTooltip:hover .content{
+    opacity:1;
+    pointer-events:all;
+}
+
+/*Positions of the tooltip*/
+.customTooltip[data-position='right'] .content{
+    left: 100%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    margin-left:20px;
+}
+.customTooltip[data-position='right']:hover .content{
+    transform:translate(0,-50%);
+}
+
+.customTooltip[data-position='bottom'] .content{
+    left: 50%;
+    top: 100%;
+    transform: translate(-50%,-50%);
+    margin-top:20px;
+}
+.customTooltip[data-position='bottom']:hover .content{
+    transform:translate(-50%,0);
+}
+
+/*Arrow*/
+.customTooltip .content:before{
+    content:'';
+    display:block;
+    position: absolute;
+}
+.customTooltip[data-position='right'] .content:before{
+    right:100%;
+    top:50%;
+    transform:translateY(-50%);
+    border-right:10px solid var(--color-primary);
+    border-top:10px solid transparent;
+    border-bottom:10px solid transparent;
+}
+.customTooltip[data-position='bottom'] .content:before{
+    bottom:100%;
+    left:50%;
+    transform:translateX(-50%);
+    border-bottom:10px solid var(--color-primary);
+    border-left:10px solid transparent;
+    border-right:10px solid transparent;
+}

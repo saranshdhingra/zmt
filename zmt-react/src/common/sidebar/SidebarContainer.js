@@ -6,6 +6,8 @@ import UserStore from '../../stores/UserStore';
 import { observer } from 'mobx-react';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import SidebarFooter from './SidebarFooter';
+import classnames from 'classnames';
 
 @observer
 class SidebarContainer extends Component {
@@ -15,7 +17,12 @@ class SidebarContainer extends Component {
     }
 
     getClasses () {
-        return this.props.openStatus ? 'sidebarContainer open' : 'sidebarContainer';
+        return classnames({
+            sidebarContainer: true,
+            open: this.props.openStatus,
+            'd-flex': true,
+            'flex-column': true
+        });
     }
 
     render () {
@@ -31,6 +38,7 @@ class SidebarContainer extends Component {
                     )
                 }
                 <SidebarMenuList openStatus={this.props.openStatus} />
+                <SidebarFooter />
             </div>
         );
     }

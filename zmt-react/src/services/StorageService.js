@@ -1,10 +1,16 @@
-// import LocalStorageDriver from './drivers/LocalStorageDriver';
+import LocalStorageDriver from './drivers/LocalStorageDriver';
 import ChromeStorageDriver from './drivers/ChromeStorageDriver';
+import BrowserService from './BrowserService';
 
 
 class StorageService {
     constructor () {
-        this.driver = ChromeStorageDriver;
+        if (BrowserService.env === 'local') {
+            this.driver = LocalStorageDriver;
+        }
+        else if (BrowserService.env === 'chrome') {
+            this.driver = ChromeStorageDriver;
+        }
     }
 
     set (key, val) {
