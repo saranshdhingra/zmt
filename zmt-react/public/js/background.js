@@ -109,7 +109,7 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 	});
 });
 
-// this makes sure that users don't trigger a 'view' when they see the image themeselves.
+// this makes sure that users don't trigger a 'view' when they see the image themselves.
 chrome.webRequest.onBeforeRequest.addListener(function (info) {
 	const hash = helpers.getParameterByName('hash', info.url);
 	if (window.user && window.user.verified && hash != null && window.hashes && window.hashes.indexOf(hash) != -1) {
@@ -125,32 +125,35 @@ chrome.webRequest.onBeforeRequest.addListener(function (info) {
  * message passing receiver
  * this should take care of things like dynamically adding hashes to our whitelist
  */
-chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 	if (request.action === 'add_hash') {
 		console.log('received hash', request.hash);
 
 		// it is important to have the latest settings before we add the hash to local.
-		await refreshSettingsFromStorage();
-		let hashes = window.hashes ? window.hashes : [];
+		refreshSettingsFromStorage().then(function () {
+			let hashes = window.hashes ? window.hashes : [];
 
-		// if we don't have the hash already, add it
-		// this may happen in case of same messages being pushed from within other places of the extension
-		if (hashes.indexOf(request.hash) === -1)
-			hashes.push(request.hash);
+			// if we don't have the hash already, add it
+			// this may happen in case of same messages being pushed from within other places of the extension
+			if (hashes.indexOf(request.hash) === -1)
+				hashes.push(request.hash);
 
-		console.log('added hash', request.hash);
+			console.log('added hash', request.hash);
 
-		// this step may not be needed, because as soon as we set the new hashes in the storage
-		// refreshSettingsFromStorage  will be called because of the event handler of onChanged
-		window.hashes = hashes;
-		await helpers.storage.set('hashes', hashes);
-
-		console.log('storage updated', request.hash);
-		sendResponse({ 'action': 'done' });
-
-		console.log('response sent');
+			// this step may not be needed, because as soon as we set the new hashes in the storage
+			// refreshSettingsFromStorage  will be called because of the event handler of onChanged
+			window.hashes = hashes;
+			helpers.storage.set('hashes', hashes).then(function () {
+				console.log('storage updated', request.hash);
+				sendResponse({ 'action': 'done' });
+				console.log('response sent');
+			});
+		});
 	}
+
+	// when we send return true, the content script waits for the sendResponse() function
+	// i.e. calls it asynchronously
 	return true;
 });
 

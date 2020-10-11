@@ -378,8 +378,8 @@ async function addHashToStorage (hash) {
 		chrome.runtime.sendMessage({
 			action: 'add_hash',
 			hash: hash
-		}, (response) => {
-			log('runtime.sendMessage callback');
+		}, function (response) {
+			log('runtime.sendMessage callback', response);
 			resolve();
 		});
 	});
