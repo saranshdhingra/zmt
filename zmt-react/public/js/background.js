@@ -93,7 +93,7 @@ chrome.runtime.onInstalled.addListener(async function () {
 
 	// check if user has seen the changelog
 	const version = await helpers.storage.get('last_seen_version'),
-		cur_version = chrome.app.getDetails().version;
+		cur_version = chrome.runtime.getManifest().version;
 
 	if (version != cur_version) {
 		chrome.browserAction.setBadgeText({

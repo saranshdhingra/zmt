@@ -8,7 +8,7 @@ class BrowserService {
             return '4.0.1';
         }
         else if (this.env === 'chrome') {
-            return chrome.app.getDetails().version;
+            return chrome.runtime.getManifest().version;
         }
     }
 
