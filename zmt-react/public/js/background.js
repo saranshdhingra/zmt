@@ -93,6 +93,7 @@ Sentry.init({
 	integrations: [
 		new Sentry.Integrations.BrowserTracing()
 	],
+	ignoreErrors: ['ResizeObserver loop limit exceeded'],
 	tracesSampleRate: 1.0
 });
 
