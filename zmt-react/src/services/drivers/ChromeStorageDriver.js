@@ -1,4 +1,6 @@
 /* eslint-disable no-undef */
+import { toJS } from 'mobx';
+
 class ChromeStorageDriver {
     /**
      * Func that sets the chrome.storage.local val for the given key
@@ -9,7 +11,7 @@ class ChromeStorageDriver {
     async set (key, val) {
         return new Promise((resolve) => {
             let data = {};
-            data[key] = val;
+            data[key] = toJS(val);
             chrome.storage.local.set(data, () => {
                 resolve();
             });
