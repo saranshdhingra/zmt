@@ -97,6 +97,8 @@ Sentry.init({
 	tracesSampleRate: 1.0
 });
 
+Sentry.setTag('version', chrome.runtime.getManifest().version);
+
 // when extension is loaded
 chrome.runtime.onInstalled.addListener(async function () {
 	await refreshSettingsFromStorage();
@@ -179,6 +181,14 @@ async function refreshSettingsFromStorage () {
 	window.user = user;
 	window.settings = settings;
 	window.hashes = hashes;
+
+	// add contextual data for sentry
+	if (window.user && window.user.email) {
+		Sentry.setTag('userEmail', window.user.email);
+	}
+	if (window.settings) {
+		Sentry.setTag('settings', JSON.stringify(window.settings));
+	}
 
 	if (user && user.verified && user.channel && settings && settings.notifications) {
 		pubnubManager.initPubnub();

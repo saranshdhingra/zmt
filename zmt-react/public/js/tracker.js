@@ -35,6 +35,8 @@ jQuery(document).ready(async function ($) {
 		tracesSampleRate: 1.0
 	});
 
+	Sentry.setTag('version', chrome.runtime.getManifest().version);
+
 	addBoilerplateHtml();
 
 	await refreshSettingsFromStorage();
@@ -114,6 +116,14 @@ async function refreshSettingsFromStorage () {
 	window.user = await helpers.storage.get('user');
 	window.settings = await helpers.storage.get('settings');
 	window.hashes = await helpers.storage.get('hashes');
+
+	// add contextual data for sentry
+	if (window.user && window.user.email) {
+		Sentry.setTag('userEmail', window.user.email);
+	}
+	if (window.settings) {
+		Sentry.setTag('settings', JSON.stringify(window.settings));
+	}
 }
 
 /**
