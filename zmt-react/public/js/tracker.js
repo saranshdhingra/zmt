@@ -31,6 +31,7 @@ jQuery(document).ready(async function ($) {
 		integrations: [
 			new Sentry.Integrations.BrowserTracing()
 		],
+		ignoreErrors: ['ResizeObserver loop limit exceeded'],
 		tracesSampleRate: 1.0
 	});
 
@@ -250,7 +251,7 @@ async function insertTracker (sendBtn) {
 			// this is done because the onStorage Changed listener doesn't refresh the window settings when the hashes are changed.
 			// this is done to avoid unnecessary refresh cycles.
 			// the hash is only refreshed from here, moreover we it's not important for tracker to have an updated copy of the hashes immediately
-			if (window.hashes.indexOf(hash) === -1) {
+			if (window.hashes && window.hashes.indexOf(hash) === -1) {
 				window.hashes.push(hash);
 			}
 
