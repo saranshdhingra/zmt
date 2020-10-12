@@ -99,7 +99,12 @@ var helpers = {
 	},
 
 	extractEmailsFromText: function (text) {
-		return text.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi);
+		try {
+			return text.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi);
+		}
+		catch (err) {
+			return 'N/A';
+		}
 	},
 
 	storage: new StorageService()
