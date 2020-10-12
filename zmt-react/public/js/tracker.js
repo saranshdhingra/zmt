@@ -26,6 +26,14 @@ jQuery(document).ready(async function ($) {
 		return;
 	}
 
+	Sentry.init({
+		dsn: env.sentryDsn,
+		integrations: [
+			new Sentry.Integrations.BrowserTracing()
+		],
+		tracesSampleRate: 1.0
+	});
+
 	addBoilerplateHtml();
 
 	await refreshSettingsFromStorage();
@@ -73,7 +81,7 @@ jQuery(document).ready(async function ($) {
 
 
 	$('body').find(`#${alertElId} .close`).on('click', function () {
-		$('#{alertElId}').removeClass(['visible', 'success', 'error', 'info']);
+		$(`#${alertElId}`).removeClass(['visible', 'success', 'error', 'info']);
 	});
 
 	// our failsafe that cancels the tracker and simply sends the mail
@@ -343,14 +351,15 @@ function getBccFromSendBtn (send_btn) {
  * @returns {Promise<unknown>}
  */
 async function fetchHashFromServer (sendBtn, subject, toField, ccField, bccField) {
+	const data = {
+		api_token: window.user.apiToken,
+		subject: subject,
+		to_field: toField,
+		cc_field: ccField,
+		bcc_field: bccField
+	};
 	return new Promise((resolve, reject) => {
-		$.post(base_url + 'img/new', {
-			api_token: window.user.apiToken,
-			subject: subject,
-			to_field: toField,
-			cc_field: ccField,
-			bcc_field: bccField
-		}, async function (response) {
+		$.post(base_url + 'img/new', data, async function (response) {
 			// TODO, change this way of checking success
 			if (response.code == '1') {
 				resolve(response.hash);
@@ -358,12 +367,14 @@ async function fetchHashFromServer (sendBtn, subject, toField, ccField, bccField
 			else {
 				log('Response code invalid while fetching hash', response);
 				reject('Unable to generate tracking pixel!');
+				Sentry.captureException(new Error(JSON.stringify({ response, data })));
 				await zmtHideLoader();
 				zmtShowAlert('Tracker inserting failed!', 'error');
 				sendMail(sendBtn);
 			}
 		}).fail(function (err) {
 			log('ajax request failed in fetchHashFromServer', err);
+			Sentry.captureException(err);
 			reject(err);
 		});
 	});
@@ -495,7 +506,7 @@ function zmtShowAlert (msg, type) {
  */
 function log () {
 	if (window.settings && window.settings.debug)
-		console.log(arguments);
+		console.log('zmt', JSON.stringify(Array.from(arguments)));
 }
 
 /**

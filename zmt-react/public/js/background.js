@@ -5,7 +5,8 @@ const notificationImgUrl = 'images/icon_notif.png',
 		GLOBAL: { key: 'global', id: 'zmt_global' }
 	},
 	blockingUrl = '*://zohomailtracker.com/api/v3/img/show?hash=*',
-	replacementPixelUrl = 'https://zohomailtracker.com/images/onepix.gif';
+	replacementPixelUrl = 'https://zohomailtracker.com/images/onepix.gif',
+	sentryDsn = env.sentryDsn;
 
 class PubNubManager {
 	constructor () {
@@ -86,6 +87,14 @@ class PubNubManager {
 }
 
 const pubnubManager = new PubNubManager();
+
+Sentry.init({
+	dsn: env.sentryDsn,
+	integrations: [
+		new Sentry.Integrations.BrowserTracing()
+	],
+	tracesSampleRate: 1.0
+});
 
 // when extension is loaded
 chrome.runtime.onInstalled.addListener(async function () {

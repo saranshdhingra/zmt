@@ -29,12 +29,12 @@
   ],
   "content_scripts": [{
     "matches": ["<all_urls>"],
-    "js": ["js/jquery-3.3.1.min.js","js/helpers.js","js/tracker.js"],
+    "js": ["js/environment.js","js/sentry.js","js/jquery-3.3.1.min.js","js/helpers.js","js/tracker.js"],
     "css":["css/tracker.css"],
     "run_at": "document_end"
   }],
   "background": {
-    "scripts": ["js/environment.js","js/helpers.js","js/pubnub.js","js/background.js"],
+    "scripts": ["js/environment.js","js/sentry.js","js/helpers.js","js/pubnub.js","js/background.js"],
     "persistent": true
   },
   "browser_action":{}
