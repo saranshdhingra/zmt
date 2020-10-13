@@ -1,7 +1,7 @@
 const imagesBaseUrl = chrome.extension.getURL('images/'),
 	failureImgSrc = `${imagesBaseUrl}tracker_failed.png`,
 	successImgSrc = `${imagesBaseUrl}tracker_inserted.png`,
-	base_url = 'https://zohomailtracker.com/api/v3/',
+	apiBaseUrl = 'https://zohomailtracker.com/api/v3/',
 	zohoDomainPattern = new RegExp('^mail\.zoho\.[a-z]+$'),
 	failureMessages = {
 		NEEDS_RELOAD: 'the page needs a reload!',
@@ -250,28 +250,23 @@ async function insertTracker (sendBtn) {
 		}
 
 		log('fetching hash from server');
-		try {
-			const hash = await fetchHashFromServer(sendBtn, subject, toField, ccField, bccField);
-			log('hash received from server', hash);
+		const hash = await fetchHashFromServer(sendBtn, subject, toField, ccField, bccField);
+		log('hash received from server', hash);
 
-			// first make sure that the hash is added to the list of hashes to be blocked, then append the image in the ,mail.
-			await addHashToStorage(hash);
-			log('hash added to localstorage', hash);
+		// first make sure that the hash is added to the list of hashes to be blocked, then append the image in the ,mail.
+		await addHashToStorage(hash);
+		log('hash added to localstorage', hash);
 
-			// this is done because the onStorage Changed listener doesn't refresh the window settings when the hashes are changed.
-			// this is done to avoid unnecessary refresh cycles.
-			// the hash is only refreshed from here, moreover we it's not important for tracker to have an updated copy of the hashes immediately
-			if (window.hashes && window.hashes.indexOf(hash) === -1) {
-				window.hashes.push(hash);
-			}
-
-			await zmtHideLoader();
-			let pixelImage = `<div class="zmt_pixel_div"><img src='${base_url}img/show?hash=${hash}' class='zmt_pixel' /><br /></div>`;
-			mailBody.contents().find('body').append(pixelImage);
+		// this is done because the onStorage Changed listener doesn't refresh the window settings when the hashes are changed.
+		// this is done to avoid unnecessary refresh cycles.
+		// the hash is only refreshed from here, moreover we it's not important for tracker to have an updated copy of the hashes immediately
+		if (window.hashes && window.hashes.indexOf(hash) === -1) {
+			window.hashes.push(hash);
 		}
-		catch (err) {
-			Sentry.captureException(err);
-		}
+
+		await zmtHideLoader();
+		let pixelImage = `<div class="zmt_pixel_div"><img src='${apiBaseUrl}img/show?hash=${hash}' class='zmt_pixel' /><br /></div>`;
+		mailBody.contents().find('body').append(pixelImage);
 	}
 	catch (err) {
 		log('Tracker failed', err);
@@ -376,7 +371,7 @@ async function fetchHashFromServer (sendBtn, subject, toField, ccField, bccField
 		bcc_field: bccField
 	};
 	return new Promise((resolve, reject) => {
-		$.post(base_url + 'img/new', data, async function (response) {
+		$.post(`${apiBaseUrl}img/new`, data, async function (response) {
 			// TODO, change this way of checking success
 			if (response.code == '1') {
 				resolve(response.hash);
@@ -390,8 +385,9 @@ async function fetchHashFromServer (sendBtn, subject, toField, ccField, bccField
 			}
 		}).fail(function (err) {
 			log('ajax request failed in fetchHashFromServer', err);
-			Sentry.captureException(err);
-			reject(err);
+
+			// Sentry.captureException(new Error(err));
+			reject(new Error(err));
 		});
 	});
 }
