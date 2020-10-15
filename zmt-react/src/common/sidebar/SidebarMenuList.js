@@ -22,7 +22,7 @@ class SidebarMenuList extends Component {
 
     async logoutHandler (e) {
         e.preventDefault();
-        await StorageService.remove('user');
+        await StorageService.clear();
         this.userStore.logoutUser();
     }
 

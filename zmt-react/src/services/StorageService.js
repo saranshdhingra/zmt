@@ -28,6 +28,10 @@ class StorageService {
     has (key) {
         return this.driver.has(key);
     }
+
+    clear () {
+        return this.driver.clear();
+    }
 }
 
 export default new StorageService();

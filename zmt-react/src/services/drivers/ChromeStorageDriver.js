@@ -53,6 +53,13 @@ class ChromeStorageDriver {
         const obj = await this.get(key);
         return obj[key] !== undefined;
     }
+
+    async clear () {
+        return new Promise((resolve) => {
+           chrome.storage.local.clear();
+           resolve();
+        });
+    }
 }
 
 export default new ChromeStorageDriver();
