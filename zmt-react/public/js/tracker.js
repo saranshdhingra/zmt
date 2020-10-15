@@ -384,7 +384,7 @@ async function fetchHashFromServer (sendBtn, subject, toField, ccField, bccField
 				zmtShowAlert('Tracker inserting failed!', 'error');
 			}
 		}).fail(function (err) {
-			log('ajax request failed in fetchHashFromServer', err);
+			log('ajax request failed in fetchHashFromServer', err, data);
 
 			// Sentry.captureException(new Error(err));
 			reject(new Error(err));
