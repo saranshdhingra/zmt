@@ -107,5 +107,7 @@ var helpers = {
 		}
 	},
 
+	currentVersion: chrome.runtime.getManifest().version,
+
 	storage: new StorageService()
 };

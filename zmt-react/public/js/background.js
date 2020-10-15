@@ -16,7 +16,7 @@ class PubNubManager {
 
 	initPubnub () {
 		if (this.pubnub === false) {
-			console.log('initializing pubnub');
+			log('initializing pubnub');
 			this.pubnub = new PubNub({
 				subscribeKey: env.pubnub.subscribeKey,
 				ssl: true
@@ -32,7 +32,7 @@ class PubNubManager {
 	}
 
 	async attachChannel (name) {
-		console.log('attaching channel');
+		log('attaching channel');
 
 		// no need to resubscribe
 		if (this.pubnub && name && this.channelName !== name) {
@@ -44,7 +44,7 @@ class PubNubManager {
 	}
 
 	async detachChannel () {
-		console.log('detaching channel');
+		log('detaching channel');
 		if (this.pubnub !== false && this.channelName !== false) {
 			await this.pubnub.unsubscribe({
 				channels: [this.channelName]
@@ -97,7 +97,7 @@ Sentry.init({
 	tracesSampleRate: 1.0
 });
 
-Sentry.setTag('version', chrome.runtime.getManifest().version);
+Sentry.setTag('version', helpers.currentVersion);
 
 // when extension is loaded
 chrome.runtime.onInstalled.addListener(async function () {
@@ -105,9 +105,9 @@ chrome.runtime.onInstalled.addListener(async function () {
 
 	// check if user has seen the changelog
 	const version = await helpers.storage.get('last_seen_version'),
-		cur_version = chrome.runtime.getManifest().version;
+		curVersion = helpers.currentVersion;
 
-	if (version != cur_version) {
+	if (version != curVersion) {
 		chrome.browserAction.setBadgeText({
 			text: 'NEW'
 		});
@@ -140,7 +140,7 @@ chrome.webRequest.onBeforeRequest.addListener(function (info) {
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 	if (request.action === 'add_hash') {
-		console.log('received hash', request.hash);
+		log('received hash', request.hash);
 
 		// it is important to have the latest settings before we add the hash to local.
 		refreshSettingsFromStorage().then(function () {
@@ -151,15 +151,15 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 			if (hashes.indexOf(request.hash) === -1)
 				hashes.push(request.hash);
 
-			console.log('added hash', request.hash);
+			log('added hash', request.hash);
 
 			// this step may not be needed, because as soon as we set the new hashes in the storage
 			// refreshSettingsFromStorage  will be called because of the event handler of onChanged
 			window.hashes = hashes;
 			helpers.storage.set('hashes', hashes).then(function () {
-				console.log('storage updated', request.hash);
+				log('storage updated', request.hash);
 				sendResponse({ 'action': 'done' });
-				console.log('response sent');
+				log('response sent');
 			});
 		});
 	}
@@ -220,3 +220,16 @@ chrome.notifications.onClicked.addListener(function (notificationId) {
 		});
 	}
 });
+
+/**
+ * Helper log function
+ */
+function log () {
+	// if (window.settings && window.settings.debug)
+	// console.log('zmt', JSON.stringify(Array.from(arguments)));
+	Sentry.addBreadcrumb({
+		category: 'log',
+		message: JSON.stringify(Array.from(arguments)),
+		level: Sentry.Severity.Info
+	});
+}

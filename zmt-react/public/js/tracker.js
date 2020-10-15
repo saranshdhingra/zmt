@@ -35,7 +35,7 @@ jQuery(document).ready(async function ($) {
 		tracesSampleRate: 1.0
 	});
 
-	Sentry.setTag('version', chrome.runtime.getManifest().version);
+	Sentry.setTag('version', helpers.currentVersion);
 
 	addBoilerplateHtml();
 
@@ -517,8 +517,13 @@ function zmtShowAlert (msg, type) {
  * Helper log function
  */
 function log () {
-	if (window.settings && window.settings.debug)
-		console.log('zmt', JSON.stringify(Array.from(arguments)));
+	// if (window.settings && window.settings.debug)
+		// console.log('zmt', JSON.stringify(Array.from(arguments)));
+	Sentry.addBreadcrumb({
+		category: 'log',
+		message: JSON.stringify(Array.from(arguments)),
+		level: Sentry.Severity.Info
+	});
 }
 
 /**
