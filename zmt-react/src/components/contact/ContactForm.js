@@ -8,6 +8,7 @@ import { validate } from 'validate.js';
 import Swal from 'sweetalert2';
 import { observer } from 'mobx-react';
 import UserStore from '../../stores/UserStore';
+import BrowserService from '../../services/BrowserService';
 
 const DEFAULT_MSG_TYPE = 'Feedback';
 
@@ -68,7 +69,8 @@ class ContactForm extends React.Component {
             name: this.nameRef.current.value,
             email: this.emailRef.current.value,
             type: this.state.type,
-            message: this.msgRef.current.value
+            message: this.msgRef.current.value,
+            version: BrowserService.getCurrentVersion()
         };
     }
 
