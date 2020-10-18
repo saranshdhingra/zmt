@@ -107,7 +107,19 @@ var helpers = {
 		}
 	},
 
-	currentVersion: chrome.runtime.getManifest().version,
+	currentVersion: () => {
+		try {
+			return chrome.runtime.getManifest().version;
+		}
+		catch (err) {
+			Sentry.addBreadcrumb({
+				category: 'currentVersion',
+				message: JSON.stringify(err),
+				level: Sentry.Severity.Info
+			});
+			return 'N/A';
+		}
+	},
 
 	storage: new StorageService()
 };
