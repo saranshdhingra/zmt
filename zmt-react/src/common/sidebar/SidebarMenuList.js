@@ -34,7 +34,7 @@ class SidebarMenuList extends Component {
     }
 
     getDashboardLink () {
-        return this.userStore.user.apiToken.length ? `https://zohomailtracker.com/web-login?api_token=${this.userStore.user.apiToken}` : '#';
+        return this.userStore.user.apiToken.length ? `http://zohomailtracker.local/v4/web-login?api_token=${this.userStore.user.apiToken}` : '#';
     }
 
     getListItems () {

@@ -4,8 +4,8 @@ const notificationImgUrl = 'images/icon_notif.png',
 		CONTACT: { key: 'contact', id: 'zmt_contact' },
 		GLOBAL: { key: 'global', id: 'zmt_global' }
 	},
-	blockingUrl = '*://zohomailtracker.com/api/v3/img/show?hash=*',
-	replacementPixelUrl = 'https://zohomailtracker.com/images/onepix.gif',
+	blockingUrl = '*://zohomailtracker.local/api/v3/img/show?hash=*',
+	replacementPixelUrl = 'http://zohomailtracker.local/images/onepix.gif',
 	sentryDsn = env.sentryDsn;
 
 class PubNubManager {
