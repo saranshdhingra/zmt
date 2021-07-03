@@ -1,7 +1,7 @@
 const imagesBaseUrl = chrome.extension.getURL('images/'),
 	failureImgSrc = `${imagesBaseUrl}tracker_failed.png`,
 	successImgSrc = `${imagesBaseUrl}tracker_inserted.png`,
-	apiBaseUrl = 'http://zohomailtracker.local/api/v3/',
+	apiBaseUrl = 'https://zohomailtracker.com/api/v3/',
 	zohoDomainPattern = new RegExp('^mail\.zoho\.[a-z]+$'),
 	failureMessages = {
 		NEEDS_RELOAD: 'the page needs a reload!',
