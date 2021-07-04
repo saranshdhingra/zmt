@@ -36,7 +36,7 @@ class App extends Component {
     }
 
     componentDidMount () {
-        axios.defaults.baseURL = 'https://zohomailtracker.com/api/v3';
+        axios.defaults.baseURL = process.env.REACT_APP_API_BASE_URL;
 
         axios.interceptors.response.use((response) => {
             const resCode = _.get(response, 'data.code', undefined),

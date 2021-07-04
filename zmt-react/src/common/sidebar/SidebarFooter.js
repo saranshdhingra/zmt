@@ -25,7 +25,7 @@ class SidebarFooter extends React.Component {
         // eslint-disable-next-line no-undef
         const curVersion = BrowserService.getCurrentVersion(),
             latestVersion = this.state.latestVersion,
-            githubLink = 'https://github.com/supernova13892/zmt';
+            githubLink = 'https://github.com/saranshdhingra/zmt';
         return (
             <div className={'sidebarFooter'}>
                 Current Version: <span className={'version'}>{curVersion}</span><br />
