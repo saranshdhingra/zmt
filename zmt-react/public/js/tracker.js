@@ -1,7 +1,7 @@
 const imagesBaseUrl = chrome.extension.getURL('images/'),
 	failureImgSrc = `${imagesBaseUrl}tracker_failed.png`,
 	successImgSrc = `${imagesBaseUrl}tracker_inserted.png`,
-	apiBaseUrl = 'https://zohomailtracker.com/api/v3/',
+	apiBaseUrl = env.baseUrl,
 	zohoDomainPattern = new RegExp('^mail\.zoho\.[a-z]+$'),
 	failureMessages = {
 		NEEDS_RELOAD: 'the page needs a reload!',
@@ -371,23 +371,28 @@ async function fetchHashFromServer (sendBtn, subject, toField, ccField, bccField
 		bcc_field: bccField
 	};
 	return new Promise((resolve, reject) => {
-		$.post(`${apiBaseUrl}img/new`, data, async function (response) {
-			// TODO, change this way of checking success
-			if (response.code == '1') {
+		fetch(`${apiBaseUrl}img/new`,{
+			method:'POST',
+			mode:'cors',
+			cache: 'no-cache',
+			headers:{
+				'Authorization':`Bearer ${window.user.apiToken}`,
+				'Content-type':'application/json'
+			},
+			body: JSON.stringify(data)
+		}).then(async (response)=>{
+			try{
+				response=await response.json();
 				resolve(response.hash);
 			}
-			else {
+			catch(err){
+				console.log(err);
 				log('Response code invalid while fetching hash', response);
-				reject('Unable to generate tracking pixel!');
 				Sentry.captureException(new Error(JSON.stringify({ response, data })));
 				await zmtHideLoader();
 				zmtShowAlert('Tracker inserting failed!', 'error');
+				reject('Unable to generate tracking pixel!');
 			}
-		}).fail(function (err) {
-			log('ajax request failed in fetchHashFromServer', err, data);
-
-			// Sentry.captureException(new Error(err));
-			reject(new Error(err));
 		});
 	});
 }
