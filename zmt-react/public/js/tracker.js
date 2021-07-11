@@ -2,6 +2,7 @@ const imagesBaseUrl = chrome.extension.getURL('images/'),
 	failureImgSrc = `${imagesBaseUrl}tracker_failed.png`,
 	successImgSrc = `${imagesBaseUrl}tracker_inserted.png`,
 	apiBaseUrl = env.baseUrl,
+	pixelBaseUrl = env.pixelBaseUrl,
 	zohoDomainPattern = new RegExp('^mail\.zoho\.[a-z]+$'),
 	failureMessages = {
 		NEEDS_RELOAD: 'the page needs a reload!',
@@ -265,7 +266,7 @@ async function insertTracker (sendBtn) {
 		}
 
 		await zmtHideLoader();
-		let pixelImage = `<div class="zmt_pixel_div"><img src='${apiBaseUrl}img/show?hash=${hash}' class='zmt_pixel' /><br /></div>`;
+		let pixelImage = `<div class="zmt_pixel_div"><img src='${pixelBaseUrl}?hash=${hash}' class='zmt_pixel' /><br /></div>`;
 		mailBody.contents().find('body').append(pixelImage);
 	}
 	catch (err) {

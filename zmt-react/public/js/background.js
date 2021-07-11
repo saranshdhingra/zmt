@@ -4,7 +4,7 @@ const notificationImgUrl = 'images/icon_notif.png',
 		CONTACT: { key: 'contact', id: 'zmt_contact' },
 		GLOBAL: { key: 'global', id: 'zmt_global' }
 	},
-	blockingUrl = env.blockingUrl,
+	blockingUrls = env.blockingUrls,
 	replacementPixelUrl = env.replacementPixelUrl,
 	sentryDsn = env.sentryDsn;
 
@@ -130,7 +130,7 @@ chrome.webRequest.onBeforeRequest.addListener(function (info) {
 		};
 	}
 }, {
-	urls: [blockingUrl]
+	urls: blockingUrls
 }, ['blocking']);
 
 /**
