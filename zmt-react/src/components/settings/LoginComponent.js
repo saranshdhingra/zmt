@@ -8,6 +8,7 @@ import StorageService from '../../services/StorageService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faSignInAlt, faSync, faTimes } from '@fortawesome/free-solid-svg-icons';
 import SettingsStore from '../../stores/SettingsStore';
+import Tooltip from '../../common/tooltip/Tooltip';
 
 @observer
 class LoginComponent extends React.Component {
@@ -73,7 +74,7 @@ class LoginComponent extends React.Component {
 
             // log the user in
             StorageService.set('user', this.store.user);
-            
+
             // when we verify, make sure the initial options are on
             this.settingsStore.setTracking(true);
             this.settingsStore.setNotifications(true);
@@ -114,7 +115,16 @@ class LoginComponent extends React.Component {
         if (this.store.user.email !== undefined && !this.store.user.verified) {
            return (
                <div className='form-group'>
-                    <label htmlFor='inputOtp'>Enter the Otp:</label>
+                    <label htmlFor='inputOtp'>
+                        Enter the Verification code 
+                        <Tooltip styleType="style-2" style={{fontSize:'.9rem',margin:'0 5px'}} content={(
+                            <div>
+                                <p>A verification code has been sent to your email which you need to input here.</p>
+                                <p>Be sure to check the <strong>Notifications</strong> folder too!</p>
+                                <p><em>We need this so that we can verify your ownership to this email.</em></p>
+                            </div>
+                        )}/>:
+                    </label>
                     <input
                       type='text'
                       id='inputOtp'

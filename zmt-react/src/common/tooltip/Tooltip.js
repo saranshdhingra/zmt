@@ -5,7 +5,8 @@ import './Tooltip.css';
 
 export default class Tooltip extends Component {
     getClasses () {
-        return `customTooltip style-1`;
+        const styleType = this.props.styleType || 'style-1';
+        return `customTooltip ${styleType}`;
     }
 
     getTooltipPosition () {
@@ -13,9 +14,9 @@ export default class Tooltip extends Component {
     }
 
     render () {
+        const styleObj = this.props.style || {};
         return (
-
-            <span className={this.getClasses()} data-position={this.getTooltipPosition()}>
+            <span style={styleObj} className={this.getClasses()} data-position={this.getTooltipPosition()}>
                 <FontAwesomeIcon icon={faQuestionCircle} />
                 <div className='content'>{this.props.content}</div>
             </span>
