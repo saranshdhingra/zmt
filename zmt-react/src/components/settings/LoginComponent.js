@@ -7,6 +7,7 @@ import { getClassesFromObj } from '../../utils/common';
 import StorageService from '../../services/StorageService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faSignInAlt, faSync, faTimes } from '@fortawesome/free-solid-svg-icons';
+import SettingsStore from '../../stores/SettingsStore';
 
 @observer
 class LoginComponent extends React.Component {
@@ -14,6 +15,7 @@ class LoginComponent extends React.Component {
     constructor (props) {
         super(props);
         this.store = UserStore;
+        this.settingsStore = SettingsStore;
         this.authService = AuthService;
         this.state = {
             currentEmail: this.store.user.email,
@@ -68,7 +70,15 @@ class LoginComponent extends React.Component {
         this.setState({ verifying: true });
         try {
             await this.authService.verify(this.state.currentEmail, this.state.currentOtp);
+
+            // log the user in
             StorageService.set('user', this.store.user);
+            
+            // when we verify, make sure the initial options are on
+            this.settingsStore.setTracking(true);
+            this.settingsStore.setNotifications(true);
+            this.settingsStore.setDebug(true);
+            StorageService.set('settings', this.settingsStore.settings);
         }
         finally {
             this.setState({ verifying: false });
