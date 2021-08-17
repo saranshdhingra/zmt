@@ -8,59 +8,56 @@ const notificationImgUrl = 'images/icon_notif.png',
 	replacementPixelUrl = env.replacementPixelUrl,
 	sentryDsn = env.sentryDsn;
 
-class PubNubManager {
-	constructor () {
-		this.pubnub = false;
-		this.channelName = false;
+const SOCKETIO_ENDPOINT=env.socketIoEndpoint;
+
+class NotificationManager {
+	constructor(){
+		this.socket = false;
 	}
 
-	initPubnub () {
-		if (this.pubnub === false) {
-			log('initializing pubnub');
-			this.pubnub = new PubNub({
-				subscribeKey: env.pubnub.subscribeKey,
-				ssl: true
+	init(token){
+		if(this.socket===false){
+			this.socket = io(SOCKETIO_ENDPOINT,{
+				extraHeaders:{
+					Authorization: `Bearer ${token}`
+				}
 			});
 
-			this.pubnub.addListener({
-				message: (message) => {
-					// handle message
-					this.displayNotification(message);
+			this.socket.on("connect", () => {
+				console.log("connected");
+			});
+			  
+			this.socket.on("disconnect", () => {
+				console.log("disconnected");
+			});
+
+			this.socket.on('message',(data)=>{
+				try{
+					const obj = JSON.parse(data);
+					this.displayNotification(obj);
+				}
+				catch(err){
+					console.log('Error in parsing notification content!');
 				}
 			});
 		}
 	}
 
-	async attachChannel (name) {
-		log('attaching channel');
-
-		// no need to resubscribe
-		if (this.pubnub && name && this.channelName !== name) {
-			await this.pubnub.subscribe({
-				channels: [name]
-			});
-			this.channelName = name;
-		}
-	}
-
-	async detachChannel () {
-		log('detaching channel');
-		if (this.pubnub !== false && this.channelName !== false) {
-			await this.pubnub.unsubscribe({
-				channels: [this.channelName]
-			});
-			this.channelName = false;
+	disconnect(){
+		if(this.socket!==false){
+			this.socket.disconnect();
+			this.socket = false;
 		}
 	}
 
 	displayNotification (message) {
 		try {
-			const type = message.message.type;
+			const type = message.type;
 			if (type === notificationTypes.EMAIL_VIEW.key) {
-				chrome.notifications.create(`${notificationTypes.EMAIL_VIEW.id}_${message.message.id}`, {
+				chrome.notifications.create(`${notificationTypes.EMAIL_VIEW.id}_${message.id}`, {
 					type: 'basic',
 					title: 'Someone viewed an email!',
-					message: `Subject: ${message.message.sub}\nLocation: ${message.message.location}`,
+					message: `Subject: ${message.sub}\nLocation: ${message.location}`,
 					iconUrl: notificationImgUrl
 				});
 			}
@@ -68,15 +65,15 @@ class PubNubManager {
 				chrome.notifications.create(`${notificationTypes.CONTACT.id}_${(new Date()).getMilliseconds()}`, {
 					type: 'basic',
 					title: 'Someone sent a contact entry!',
-					message: `Type:${message.message.contactType}\nEmail:${message.message.email}`,
+					message: `Type:${message.contactType}\nEmail:${message.email}`,
 					iconUrl: notificationImgUrl
 				});
 			}
 			else if (type === notificationTypes.GLOBAL.key) {
 				chrome.notifications.create(`${notificationTypes.GLOBAL.id}_${(new Date()).getMilliseconds()}`, {
 					type: 'basic',
-					title: message.message.title,
-					message: message.message.body,
+					title: message.title,
+					message: message.body,
 					iconUrl: notificationImgUrl
 				});
 			}
@@ -86,7 +83,7 @@ class PubNubManager {
 	}
 }
 
-const pubnubManager = new PubNubManager();
+const notifManager = new NotificationManager();
 
 Sentry.init({
 	dsn: env.sentryDsn,
@@ -191,11 +188,10 @@ async function refreshSettingsFromStorage () {
 	}
 
 	if (user && user.verified && user.channel && settings && settings.notifications) {
-		pubnubManager.initPubnub();
-		pubnubManager.attachChannel(user.channel);
+		notifManager.init(user.apiToken);
 	}
 	else {
-		pubnubManager.detachChannel();
+		notifManager.disconnect();
 	}
 }
 
