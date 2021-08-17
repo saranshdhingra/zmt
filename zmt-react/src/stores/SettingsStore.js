@@ -5,8 +5,7 @@ class SettingsStore {
         this.settings = {
             tracking: false,
             notifications: false,
-            debug: false,
-            timezone: 'GMT'
+            debug: false
         };
     }
     @observable settings;
@@ -26,11 +25,6 @@ class SettingsStore {
         this.settings.debug = status;
     }
 
-    @action
-    setTimezone (timezone) {
-        this.settings.timezone = timezone;
-    }
-
     setSettings (data) {
         if (!data)
             return;
@@ -42,9 +36,6 @@ class SettingsStore {
         }
         if (data.debug !== undefined) {
             this.setDebug(data.debug);
-        }
-        if (data.timezone !== undefined) {
-            this.setTimezone(data.timezone);
         }
     }
 }

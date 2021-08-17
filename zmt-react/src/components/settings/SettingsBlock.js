@@ -1,6 +1,5 @@
 import React from 'react';
 import Checkbox from '../../common/checkbox/Checkbox';
-import Select from 'react-select';
 
 
 class SettingsBlock extends React.Component {
@@ -21,27 +20,9 @@ class SettingsBlock extends React.Component {
         );
     }
 
-    getDropdownSelectedOption () {
-        if (this.props.value) {
-            return { value: this.props.value, label: this.props.value };
-        }
-    }
-
-    getDropdownSetting () {
-        const options = this.props.options;
-        return (
-            <div className={`settingsBlock d-flex justify-content-between ${this.props.classes.join(' ')}`}>
-                <label>{this.props.label}</label>
-                <span className='dropdown'>
-                    <Select options={options} value={this.getDropdownSelectedOption()} onChange={this.props.changed} />
-                </span>
-            </div>
-        );
-    }
-
     render () {
         return (
-            this.props.type === 'dropdown' ? this.getDropdownSetting() : this.getCheckboxSetting()
+            this.getCheckboxSetting()
         );
     }
 }
