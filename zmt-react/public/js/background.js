@@ -19,7 +19,8 @@ class NotificationManager {
 		if(this.socket===false){
 			this.socket = io(SOCKETIO_ENDPOINT,{
 				extraHeaders:{
-					Authorization: `Bearer ${token}`
+					Authorization: `Bearer ${token}`,
+					'X-source': 'chrome'
 				}
 			});
 
