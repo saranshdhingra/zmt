@@ -1,4 +1,4 @@
-import axios from 'axios';
+import http from '../utils/http';
 import UserStore from '../stores/UserStore';
 
 class AuthService {
@@ -6,7 +6,7 @@ class AuthService {
         this.store = UserStore;
     }
     async login (email) {
-        await axios.post('/user/login',
+        await http.post('/user/login',
             {
                 email: email
             }
@@ -14,7 +14,7 @@ class AuthService {
         this.store.setUserEmail(email);
     }
     async verify (email, otp) {
-        const response = await axios.post('/user/verify',
+        const response = await http.post('/user/verify',
             {
                 email: email,
                 otp: otp

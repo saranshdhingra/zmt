@@ -1,7 +1,7 @@
 import React from 'react';
 import './SidebarFooter.scss';
 import BrowserService from '../../services/BrowserService';
-import axios from 'axios';
+import http from '../../utils/http';
 import Tooltip from '../tooltip/Tooltip';
 
 class SidebarFooter extends React.Component {
@@ -13,7 +13,7 @@ class SidebarFooter extends React.Component {
     }
     async componentDidMount () {
         try {
-            const response = await axios.get('releases');
+            const response = await http.get('/releases');
             this.setState({ latestVersion: JSON.parse(response.data.versions).chrome });
         }
         catch (err) {

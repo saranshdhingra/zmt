@@ -8,7 +8,7 @@ export default class Header extends Component {
             <header className='col-12 d-flex justify-content-start'>
                 <div className={'wrapper'}>
                     <div id='logo'>
-                        <a href='' >
+                        <a href='/' >
                             <img src={logo} alt='ZMT Logo' />
                         </a>
                     </div>

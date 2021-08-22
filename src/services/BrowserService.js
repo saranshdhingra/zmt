@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 class BrowserService {
     constructor () {
-        this.env = 'chrome';
+        this.env = process.env.REACT_APP_BROWSER_DRIVER;
     }
     getCurrentVersion () {
         if (this.env === 'local') {

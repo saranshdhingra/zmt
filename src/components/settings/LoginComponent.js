@@ -167,9 +167,9 @@ class LoginComponent extends React.Component {
                           onKeyDown={this._handleKeyDown.bind(this)}
                           disabled={this.store.user.email && !this.state.changeRequested}
                         />
-                        <a onClick={this.cancelChange.bind(this)} className='cancelBtn'>
+                        <button onClick={this.cancelChange.bind(this)} className='cancelBtn'>
                             <FontAwesomeIcon icon={faTimes} />
-                        </a>
+                        </button>
                     </div>
                     {this.getLoginBtn()}
                 </div>

@@ -1,8 +1,6 @@
 import React from 'react';
 import { getClassesFromObj } from '../../utils/common';
 
-const DESTROY_TIME = 3000;
-
 // const ANIMATION_TIME=400;
 
 class ErrorBox extends React.Component {

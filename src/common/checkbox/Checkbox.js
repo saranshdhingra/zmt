@@ -4,10 +4,6 @@ import './Checkbox.css';
 import { getClassesFromObj } from '../../utils/common';
 
 class Checkbox extends React.Component {
-    constructor (props) {
-        super(props);
-    }
-
     getClasses () {
         const obj = {
             'checkbox': true,
