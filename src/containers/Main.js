@@ -20,7 +20,7 @@ class Main extends Component {
     getMainComponent () {
         switch (this.uiStore.openPage) {
             case 'settings':
-                if (this.userStore.user.verified)
+                if (this.userStore.user.email && this.userStore.user.verified)
                     return <Settings user={this.userStore.user} />;
                 else
                     return <LoginComponent />;

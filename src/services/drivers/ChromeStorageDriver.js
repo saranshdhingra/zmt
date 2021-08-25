@@ -60,6 +60,16 @@ class ChromeStorageDriver {
            resolve();
         });
     }
+
+    /**
+     * Event triggered when storage is changed
+     * @param {function} cb 
+     */
+    async onChanged (cb){
+        chrome.storage.onChanged.addListener(async function (changes, namespace) {
+            cb(changes);
+        });
+    }
 }
 
 export default new ChromeStorageDriver();

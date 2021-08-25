@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import Main from './containers/Main';
 import Sidebar from './common/sidebar/Sidebar';
 import AppLoader from './components/AppLoader';
+import StorageService from './services/StorageService';
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
-
-// require('dotenv').config();
+import UserStore from './stores/UserStore';
+import SettingsStore from './stores/SettingsStore';
 
 const theme = createTheme({
     palette: {
@@ -24,8 +25,19 @@ const theme = createTheme({
 });
 
 class App extends Component {
-    state={
-        loading: true
+    constructor(props){
+        super(props);
+        this.state={
+            loading: true
+        };
+
+        StorageService.driver.onChanged(async function(){
+            const user = await StorageService.get('user'),
+                settings = await StorageService.get('settings');
+
+            UserStore.setUserDetails(user);
+            SettingsStore.setSettings(settings);
+        });
     }
 
     setLoadingState (status) {

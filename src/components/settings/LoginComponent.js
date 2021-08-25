@@ -1,44 +1,19 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import UserStore from '../../stores/UserStore';
-import AuthService from '../../services/AuthService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignInAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
-import SettingsStore from '../../stores/SettingsStore';
-import { Button, Typography } from '@material-ui/core';
+import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
+import { Button } from '@material-ui/core';
 
 @observer
 class LoginComponent extends React.Component {
-
-    constructor (props) {
-        super(props);
-        this.store = UserStore;
-        this.settingsStore = SettingsStore;
-        this.authService = AuthService;
-    }
-
     getComponent(){
-        if(this.store.user.email===undefined || this.store.user.apiToken===undefined){
-            return (
-                <a href="https://zohomailtracker.com/oauth/login" className="btn loginBtn" target="_blank" rel="noopener noreferrer">
-                    <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faSignInAlt} />}>
-                        Login via Zoho
-                    </Button>
-                </a>
-            );
-        }
-        else{
-            return (
-                <>
-                <Typography variant="h4">
-                    Logged in as <strong>{this.store.user.email}</strong><br />
-                </Typography>
-                <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faSignOutAlt} />}>
-                    Logout
+        return (
+            <a href="https://zohomailtracker.com/oauth/login" className="btn loginBtn" target="_blank" rel="noopener noreferrer">
+                <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faSignInAlt} />}>
+                    Login via Zoho
                 </Button>
-                </>
-            );
-        }
+            </a>
+        );
     }
 
     render () {

@@ -44,6 +44,16 @@ class LocalStorageDriver {
     async has (key) {
         return await this.get(key) !== null;
     }
+
+    /**
+     * Event triggered when storage is changed
+     * @param {function} cb 
+     */
+    async onChanged (cb){
+        window.addEventListener('storage',function(e){
+            cb(e);
+        });
+    }
 }
 
 export default new LocalStorageDriver();

@@ -25,11 +25,11 @@ class NotificationManager {
 			});
 
 			this.socket.on("connect", () => {
-				console.log("connected");
+				log("connected");
 			});
 			  
 			this.socket.on("disconnect", () => {
-				console.log("disconnected");
+				log("disconnected");
 			});
 
 			this.socket.on('message',(data)=>{
@@ -38,7 +38,7 @@ class NotificationManager {
 					this.displayNotification(obj);
 				}
 				catch(err){
-					console.log('Error in parsing notification content!');
+					log('Error in parsing notification content!');
 				}
 			});
 		}
@@ -161,6 +161,49 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 			});
 		});
 	}
+	else if(request.action === 'login_successful'){
+		log('login_successful', request.token);
+
+		fetch(env.baseUrl + 'me',{
+			method: 'POST',
+			headers: {
+				'Authorization': 'Bearer ' + request.token
+			}
+		}).then(response=>response.json()).then((response)=>{
+			try{
+
+				const user = {
+					email: response.user.email,
+					verified: true,
+					apiToken: response.user.api_token,
+					channel: response.user.channel,
+					timezone: response.user.timezone
+				},
+				settings = {
+					tracking: true,
+					notifications: true,
+					debug: true
+				};
+
+				helpers.storage.set('user', user);
+				helpers.storage.set('settings', settings);
+				sendResponse({response:'logged_in'});
+			}
+			catch(err){
+				log(err);
+			}
+		});
+	}
+	else if(request.action === 'login_failed'){
+		log('login_failed','removing user details from storage');
+		helpers.storage.set('user',{
+			email: '',
+			verified: false,
+			apiToken: '',
+			channel: '',
+			timezone: ''
+		});
+	}
 
 	// when we send return true, the content script waits for the sendResponse() function
 	// i.e. calls it asynchronously
@@ -222,8 +265,8 @@ chrome.notifications.onClicked.addListener(function (notificationId) {
  * Helper log function
  */
 function log () {
-	// if (window.settings && window.settings.debug)
-	// console.log('zmt', JSON.stringify(Array.from(arguments)));
+	if (window.settings && window.settings.debug)
+		console.log('zmt', JSON.stringify(Array.from(arguments)));
 	Sentry.addBreadcrumb({
 		category: 'log',
 		message: JSON.stringify(Array.from(arguments)),
