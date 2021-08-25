@@ -187,6 +187,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 				helpers.storage.set('user', user);
 				helpers.storage.set('settings', settings);
+				helpers.storage.set('hashes', response.user.hashes);
 				sendResponse({response:'logged_in'});
 			}
 			catch(err){
