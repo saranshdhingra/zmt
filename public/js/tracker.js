@@ -6,7 +6,8 @@ const imagesBaseUrl = chrome.extension.getURL('images/'),
     zohoDomainPattern = new RegExp('^mail\.zoho\.[a-z]+$'),
     failureMessages = {
         NEEDS_RELOAD: 'the page needs a reload!',
-        DIFFERENT_USER: 'you need to upgrade your account to track emails sent using an alias!',
+        // DIFFERENT_USER: 'you need to upgrade your account to track emails sent using an alias!',
+        DIFFERENT_USER: (sender) => `you are logged in the extension as ${window.user.email} but trying to send the email as ${sender}`,
         TRACKING_DISABLED: 'mail tracking is switched off!',
         UNVERIFIED_USER: 'user is not verified!',
         ANON_USER: 'user is not logged in!',
@@ -182,7 +183,7 @@ function replaceSendBtn(el) {
         !window.needsReload &&
         // if the user's email and the sender are different
         // we rely on the user's ability to send the emails as an alias
-        (sender === window.user.email || window.user.actions.send_email_as_alias)
+        (sender === window.user.email || (window.user.actions && window.user.actions.send_email_as_alias))
     ) {
         tooltipValue = 'Tracker will be inserted on \'Send\'';
         tooltipSrc = successImgSrc;
@@ -244,7 +245,8 @@ async function insertTracker(sendBtn) {
         let subject = getSubjectFromSendBtn(sendBtn),
             toField = getRecipientFromSendBtn(sendBtn),
             ccField = getCcFromSendBtn(sendBtn),
-            bccField = getBccFromSendBtn(sendBtn);
+            bccField = getBccFromSendBtn(sendBtn),
+            senderEmail = getEmailSender(sendBtn);
 
         if (!toField.length) {
             await zmtHideLoader();
@@ -253,7 +255,7 @@ async function insertTracker(sendBtn) {
         }
 
         log('fetching hash from server');
-        const hash = await fetchHashFromServer(sendBtn, subject, toField, ccField, bccField);
+        const hash = await fetchHashFromServer(sendBtn, subject, toField, ccField, bccField, senderEmail);
         log('hash received from server', hash);
 
         // first make sure that the hash is added to the list of hashes to be blocked, then append the image in the ,mail.
@@ -363,14 +365,16 @@ function getBccFromSendBtn(send_btn) {
  * @param bccField
  * @returns {Promise<unknown>}
  */
-async function fetchHashFromServer(sendBtn, subject, toField, ccField, bccField) {
+async function fetchHashFromServer(sendBtn, subject, toField, ccField, bccField, senderEmail) {
     const data = {
         api_token: window.user.apiToken,
         subject: subject,
         to_field: toField,
         cc_field: ccField,
-        bcc_field: bccField
+        bcc_field: bccField,
+        sender_email: senderEmail
     };
+
     return new Promise((resolve, reject) => {
         fetch(`${apiBaseUrl}img/new`, {
             method: 'POST',
@@ -544,7 +548,8 @@ function getFailedReason(sender) {
     else if (!window.settings.tracking)
         return failureMessages.TRACKING_DISABLED;
     else if (sender !== window.user.email) {
-        return failureMessages.DIFFERENT_USER;
+        // return failureMessages.DIFFERENT_USER;
+        return failureMessages.DIFFERENT_USER(sender);
     } else if (window.needsReload)
         return failureMessages.NEEDS_RELOAD;
     return failureMessages.DEFAULT_MSG;
